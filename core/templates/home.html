@@ -11,52 +11,62 @@
         body {
             background-color: #f8f9fa;
         }
-        header {
-            background-color: #0d6efd;
-            color: white;
-            padding: 1rem 0;
+        .property-card {
+            transition: transform 0.3s;
         }
-        header h1 {
-            margin: 0;
-        }
-        footer {
-            background-color: #343a40;
-            color: white;
-            padding: 0.8rem 0;
-            text-align: center;
+        .property-card:hover {
+            transform: translateY(-5px);
         }
         .carousel-item img {
-            max-height: 500px;
+            height: 180px;
             object-fit: cover;
         }
     </style>
 </head>
-<body class="bg-light">
+<body>
 
 <div class="container mt-5">
     <h1 class="mb-4 text-center">Propiedades Disponibles</h1>
+
     {% if propiedades %}
-    <div id="carouselPropiedades" class="carousel slide" data-bs-ride="carousel" style="max-width: 800px; margin:auto;">
+    <div id="carouselPropiedades" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
+
             {% for propiedad in propiedades %}
-            <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                <a href="{% url 'detalle_propiedad' propiedad.id %}">
-                    {% if propiedad.imagen %}
-                    <img src="{{ propiedad.imagen.url }}" class="d-block w-100" alt="{{ propiedad.titulo }}" style="max-height: 400px; object-fit: cover;">
-                    {% else %}
-                    <img src="{% static 'images/default.jpg' %}" class="d-block w-100" alt="Sin imagen" style="max-height: 400px; object-fit: cover;">
-                    {% endif %}
-                </a>
-                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
-                    <h5>{{ propiedad.titulo }}</h5>
-                    <p class="fw-bold text-success">${{ propiedad.precio }}</p>
-                    <p>{{ propiedad.direccion }}</p>
+                {% if forloop.counter0|divisibleby:4 %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <div class="row justify-content-center">
+                {% endif %}
+
+                        <div class="col-md-3">
+                            <div class="card property-card shadow-sm">
+                                <a href="{% url 'detalle_propiedad' propiedad.id %}">
+                                    {% with propiedad.media.all|first as media %}
+                                        {% if media %}
+                                            <!--<img src="{{ media.archivo.url }}" class="card-img-top" alt="{{ propiedad.nombre }}"> -->
+                                            <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="{{ propiedad.nombre }}">
+                                        {% else %}
+                                            <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="Sin imagen">
+                                        {% endif %}
+                                    {% endwith %}
+                                </a>
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">{{ propiedad.nombre }}</h5>
+                                    <p class="fw-bold text-success">${{ propiedad.precio_total }}</p>
+                                    <p class="text-muted">{{ propiedad.ubicacion }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                {% if forloop.counter|divisibleby:4 or forloop.last %}
+                    </div>
                 </div>
-            </div>
+                {% endif %}
             {% endfor %}
         </div>
 
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselPropiedades" data-bs-slide="prev" carousel-control-color= black>
+        <!-- Controles del carrusel -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselPropiedades" data-bs-slide="prev">
             <span class="carousel-control-prev-icon"></span>
         </button>
         <button class="carousel-control-next" type="button" data-bs-target="#carouselPropiedades" data-bs-slide="next">
