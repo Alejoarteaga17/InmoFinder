@@ -22,6 +22,7 @@ class Propiedad(models.Model):
             ('Dúplex', 'Dúplex'),
             ('Estudio', 'Estudio'),
             ('Loft', 'Loft'),
+            ('Finca', 'Finca'),
         ],default='Piso'
     )
     zonas_comunes = models.TextField(blank=True, null=True)  # piscina, gym, etc.
