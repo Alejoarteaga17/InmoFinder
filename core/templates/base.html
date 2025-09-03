@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>InmoFinder</title>
+    <nav>
+        <a href="{% url 'home' %}">Home</a>
+    </nav>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <header>
+        <h1>InmoFinder 🏠</h1>
+        
+        
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>© 2025 InmoFinder</p>
+    </footer>
+</body>
+</html>

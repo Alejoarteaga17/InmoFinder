@@ -1,4 +1,6 @@
+
 <!DOCTYPE html>
+
 {% load static %}
 <html lang="es">
 <head>
@@ -10,9 +12,6 @@
     <style>
         body {
             background-color: #f8f9fa;
-        }
-        .property-card {
-            transition: transform 0.3s;
         }
         .property-card:hover {
             transform: translateY(-5px);
@@ -26,6 +25,10 @@
 <body>
 
 <div class="container mt-5">
+    <nav>
+  <a href="{% url 'buscar_propiedades' %}">Buscar Propiedades</a>
+    </nav>
+    {% include "partials/buscador.html" %}
     <h1 class="mb-4 text-center">Propiedades Disponibles</h1>
 
     {% if propiedades %}

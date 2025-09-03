@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<h1>Buscar Propiedades</h1>
+
+<!-- Barra de búsqueda -->
+<form method="get" action="{% url 'buscar_propiedades' %}" class="search-bar">
+    <input type="text" name="q" placeholder="🔍 Buscar por ubicación, nombre o descripción" value="{{ request.GET.q }}">
+    <button type="submit">Buscar</button>
+</form>
+
+<!-- Filtros adicionales -->
+<form method="get" action="{% url 'buscar_propiedades' %}" class="filters">
+    <select name="tipo">
+        <option value="">Tipo de propiedad</option>
+        <option value="Piso" {% if request.GET.tipo == "Piso" %}selected{% endif %}>Piso</option>
+        <option value="Casa" {% if request.GET.tipo == "Casa" %}selected{% endif %}>Casa</option>
+        <option value="Chalet" {% if request.GET.tipo == "Chalet" %}selected{% endif %}>Chalet</option>
+        <option value="Ático" {% if request.GET.tipo == "Ático" %}selected{% endif %}>Ático</option>
+        <option value="Dúplex" {% if request.GET.tipo == "Dúplex" %}selected{% endif %}>Dúplex</option>
+        <option value="Estudio" {% if request.GET.tipo == "Estudio" %}selected{% endif %}>Estudio</option>
+        <option value="Loft" {% if request.GET.tipo == "Loft" %}selected{% endif %}>Loft</option>
+    </select>
+
+    <input type="number" name="precio_min" placeholder="Precio mínimo" value="{{ request.GET.precio_min }}">
+    <input type="number" name="precio_max" placeholder="Precio máximo" value="{{ request.GET.precio_max }}">
+
+    <input type="number" name="habitaciones" placeholder="Habitaciones" value="{{ request.GET.habitaciones }}">
+    <input type="number" name="banos" placeholder="Baños" value="{{ request.GET.banos }}">
+    <input type="number" name="parqueaderos" placeholder="Parqueaderos" value="{{ request.GET.parqueaderos }}">
+
+    <input type="number" name="area_min" placeholder="Área mínima (m²)" value="{{ request.GET.area_min }}">
+    <input type="number" name="area_max" placeholder="Área máxima (m²)" value="{{ request.GET.area_max }}">
+
+    <input type="date" name="disponibilidad" value="{{ request.GET.disponibilidad }}">
+
+    <label><input type="checkbox" name="garaje" value="1" {% if request.GET.garaje == "1" %}checked{% endif %}> Garaje</label>
+    <label><input type="checkbox" name="mascotas" value="1" {% if request.GET.mascotas == "1" %}checked{% endif %}> Mascotas</label>
+
+    <button type="submit">Aplicar filtros</button>
+</form>
+
+<hr>
+
+<h2>Resultados</h2>
+<div class="propiedades-container">
+    {% for propiedad in propiedades %}
+    <div class="prop-card">
+        {% if propiedad.media.first %}
+            <img src="{{ propiedad.media.first.archivo.url }}" alt="{{ propiedad.nombre }}">
+        {% else %}
+            <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="Sin imagen">
+        {% endif %}
+
+        <div class="prop-card-content">
+            <h3>{{ propiedad.nombre }}</h3>
+            <p class="price">$ {{ propiedad.precio_total|floatformat:0 }} COP</p>
+            <p class="price-m2">${{ propiedad.precio_m2|floatformat:0 }} COP/m²</p>
+            <p class="location">📍 {{ propiedad.ubicacion }}</p>
+            <p class="description">{{ propiedad.descripcion|truncatewords:15 }}</p>
+            <a href="{% url 'detalle_propiedad' propiedad.id %}">Ver más</a>
+        </div>
+    </div>
+    {% empty %}
+    <p>No se encontraron propiedades.</p>
+    {% endfor %}
+</div>
+{% endblock %}
