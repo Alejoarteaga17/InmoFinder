@@ -1,18 +1,14 @@
-from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse
-from core.models import Propiedad
-    
-# Create your views here.
-def home(request):
-    return render(request, 'home.html')
+from django.shortcuts import render, get_object_or_404
+from .models import Propiedad
 
-def lista_propiedades(request):
+def home(request):
     propiedades = Propiedad.objects.all()
-    return render(request, 'propiedades.html', {'propiedades': propiedades})
+    return render(request, 'home.html', {'propiedades': propiedades})
 
 def detalle_propiedad(request, propiedad_id):
     propiedad = get_object_or_404(Propiedad, id=propiedad_id)
-    imagenes = propiedad.imagen  # Todas las imágenes extra
+    # Si 'imagen' es un ImageField, solo hay una imagen
+    imagenes = [propiedad.imagen] if propiedad.imagen else []
     return render(request, 'detalle_propiedad.html', {
         'propiedad': propiedad,
         'imagenes': imagenes

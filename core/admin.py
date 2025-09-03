@@ -1,17 +1,19 @@
 from django.contrib import admin
-from .models import ImagenPropiedad, Propiedad
+from .models import Propiedad, MediaPropiedad
 
-admin.site.register(ImagenPropiedad)
+admin.site.register(MediaPropiedad)
 
-class ImagenPropiedadInline(admin.TabularInline):
-    model = ImagenPropiedad
+# admin.site.register(ImagenPropiedad)
+
+# class ImagenPropiedadInline(admin.TabularInline):
+#     model = ImagenPropiedad
+#     extra = 1
+
+class MediaPropiedadInline(admin.TabularInline):
+    model = MediaPropiedad
     extra = 1
 
 class PropiedadAdmin(admin.ModelAdmin):
-    inlines = [ImagenPropiedadInline]
+    pass
 
 admin.site.register(Propiedad,PropiedadAdmin)
-
-
-
-# Register your models here.
