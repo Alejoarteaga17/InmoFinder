@@ -48,7 +48,8 @@
     {% for propiedad in propiedades %}
     <div class="prop-card">
         {% if propiedad.media.first %}
-            <img src="{{ propiedad.media.first.archivo.url }}" alt="{{ propiedad.nombre }}">
+            <!--<img src="{{ propiedad.media.first.archivo.url }}" alt="{{ propiedad.nombre }}"> -->
+            <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="{{ propiedad.nombre }}">
         {% else %}
             <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="Sin imagen">
         {% endif %}
