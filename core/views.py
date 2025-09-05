@@ -1,34 +1,28 @@
 from django.shortcuts import render, get_object_or_404
+from django.core.paginator import Paginator
+from django.db.models import Q, Prefetch
 from .models import Propiedad, MediaPropiedad
-from django.db.models import Q
-
 
 def home(request):
-    """
-    Lista todas las propiedades disponibles
-    """
-    propiedades = Propiedad.objects.all().prefetch_related("media")
-    return render(request, "home.html", {"propiedades": propiedades})
-
-
-def detalle_propiedad(request, propiedad_id):
-    propiedad = get_object_or_404(Propiedad, id=propiedad_id)
-    media = propiedad.media.all()  # type: ignore # usa el related_name
-    return render(request, "detalle_propiedad.html", {"propiedad": propiedad, "media": media})
+    # Muestra últimas propiedades (o redirige a buscar)
+    qs = Propiedad.objects.all().order_by('-fecha_disponibilidad')[:12]
+    media_prefetch = Prefetch('media', queryset=MediaPropiedad.objects.exclude(archivo__isnull=True).exclude(archivo="").order_by('id'))
+    qs = qs.prefetch_related(media_prefetch)
+    return render(request, "home.html", {"propiedades": qs})
 
 def buscar_propiedades(request):
     propiedades = Propiedad.objects.all()
 
-    # --- Búsqueda por texto libre ---
-    query = request.GET.get("q")
-    if query:
+    # Texto libre
+    q = request.GET.get("q")
+    if q:
         propiedades = propiedades.filter(
-            Q(nombre__icontains=query) |
-            Q(descripcion__icontains=query) |
-            Q(ubicacion__icontains=query)
+            Q(nombre__icontains=q) |
+            Q(descripcion__icontains=q) |
+            Q(ubicacion__icontains=q)
         )
 
-    # --- Filtros ---
+    # Filtros numéricos
     precio_min = request.GET.get("precio_min")
     precio_max = request.GET.get("precio_max")
     if precio_min:
@@ -48,10 +42,7 @@ def buscar_propiedades(request):
     if parqueaderos:
         propiedades = propiedades.filter(parqueaderos=parqueaderos)
 
-    tipo = request.GET.get("tipo")
-    if tipo:
-        propiedades = propiedades.filter(tipo=tipo)
-
+    # Rango de área (si lo agregas en el formulario)
     area_min = request.GET.get("area_min")
     area_max = request.GET.get("area_max")
     if area_min:
@@ -59,16 +50,39 @@ def buscar_propiedades(request):
     if area_max:
         propiedades = propiedades.filter(area__lte=area_max)
 
-    disponibilidad = request.GET.get("disponibilidad")
-    if disponibilidad:
-        propiedades = propiedades.filter(fecha_disponibilidad__lte=disponibilidad)
+    # Otros
+    tipo = request.GET.get("tipo")
+    if tipo:
+        propiedades = propiedades.filter(tipo=tipo)
 
-    garaje = request.GET.get("garaje")
-    if garaje == "1":
+    if request.GET.get("garaje") == "1":
         propiedades = propiedades.filter(garaje=True)
-
-    mascotas = request.GET.get("mascotas")
-    if mascotas == "1":
+    if request.GET.get("mascotas") == "1":
         propiedades = propiedades.filter(mascotas=True)
 
-    return render(request, "buscar.html", {"propiedades": propiedades})
+    # Orden
+    orden = request.GET.get("orden")
+    mapping = {
+        "precio_asc": "precio_total",
+        "precio_desc": "-precio_total",
+        "area_asc": "area",
+        "area_desc": "-area",
+        "recientes": "-fecha_disponibilidad",
+    }
+    if orden in mapping:
+        propiedades = propiedades.order_by(mapping[orden])
+
+    # Prefetch media + paginación
+    media_prefetch = Prefetch('media', queryset=MediaPropiedad.objects.exclude(archivo__isnull=True).exclude(archivo="").order_by('id'))
+    propiedades = propiedades.prefetch_related(media_prefetch)
+
+    paginator = Paginator(propiedades, 12)  # 12 por página
+    page = request.GET.get("page")
+    page_obj = paginator.get_page(page)
+
+    return render(request, "buscar.html", {"propiedades": page_obj})
+
+def detalle_propiedad(request, propiedad_id):
+    propiedad = get_object_or_404(Propiedad.objects.prefetch_related('media'), pk=propiedad_id)
+    media_validas = [m for m in propiedad.media.all() if m.archivo]
+    return render(request, "detalle_propiedad.html", {"propiedad": propiedad, "media_validas": media_validas})
