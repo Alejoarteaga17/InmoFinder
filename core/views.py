@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
 from django.db.models import Q, Prefetch
 from .models import Propiedad, MediaPropiedad
+from django.utils.dateparse import parse_date
 
 def home(request):
     # Muestra últimas propiedades (o redirige a buscar)
@@ -30,6 +31,11 @@ def buscar_propiedades(request):
     if precio_max:
         propiedades = propiedades.filter(precio_total__lte=precio_max)
 
+    disponibilidad = request.GET.get("disponibilidad")
+    if disponibilidad:
+        # fecha_disponibilidad >= disponibilidad
+        propiedades = propiedades.filter(fecha_disponibilidad__date__gte=parse_date(disponibilidad))
+
     habitaciones = request.GET.get("habitaciones")
     if habitaciones:
         propiedades = propiedades.filter(habitaciones=habitaciones)
@@ -57,11 +63,13 @@ def buscar_propiedades(request):
 
     if request.GET.get("garaje") == "1":
         propiedades = propiedades.filter(garaje=True)
+
     if request.GET.get("mascotas") == "1":
         propiedades = propiedades.filter(mascotas=True)
 
     # Orden
-    orden = request.GET.get("orden")
+    # Orden
+    orden = request.GET.get("orden", "recientes")  # por defecto: recientes
     mapping = {
         "precio_asc": "precio_total",
         "precio_desc": "-precio_total",
@@ -69,8 +77,7 @@ def buscar_propiedades(request):
         "area_desc": "-area",
         "recientes": "-fecha_disponibilidad",
     }
-    if orden in mapping:
-        propiedades = propiedades.order_by(mapping[orden])
+    propiedades = propiedades.order_by(mapping.get(orden, "-fecha_disponibilidad"))
 
     # Prefetch media + paginación
     media_prefetch = Prefetch('media', queryset=MediaPropiedad.objects.exclude(archivo__isnull=True).exclude(archivo="").order_by('id'))

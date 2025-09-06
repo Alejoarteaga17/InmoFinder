@@ -1,24 +1,232 @@
-{% load static %}
 <!DOCTYPE html>
+{% load static %}
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>InmoFinder</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}InmoFinder{% endblock %}</title>
+
+  <!-- Bootstrap + Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Fuente (similar al look de la imagen) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <!-- TOKENS & estilos base -->
+  <style>
+    :root{
+      --ink:#444444;                 /* texto fuerte + btn SIGN UP */
+      --muted:#A8ADB1;               /* “InmoFinder” (gris), párrafo, lupa */
+      --muted-2:#B5B9BD;             /* placeholder (un poco más pálido que A8ADB1) */
+      --muted-3:#C6CACD;             /* borde búsqueda (más pálido que placeholder) */
+      --radius-pill:999px;
+      --btn-stroke:2px;              /* grosor igual al de LOGIN */
+      --header-pt:2.25rem;           /* más espacio arriba */
+      --header-pb:2rem;              /* y debajo del header */
+      --hero-gap:5rem;              /* espacio header→hero */
+      --search-width: 280px;
+    }
+
+    html,body{
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji", "Segoe UI Symbol";
+    background:#fff;
+    }
+
+    /* Header  */
+    header{
+    padding-top:var(--header-pt);
+    padding-bottom:var(--header-pb);
+    }
+
+    /* Marca “InmoFinder” */
+    .brand{
+    color: #828282 !important;
+    font-weight:400 !important;
+    letter-spacing:.2px;
+    text-decoration:none;
+    }
+
+    /* HERO general */
+    .hero {
+    margin-top: var(--hero-gap);
+    margin-bottom: 15rem;
+    }
+
+    /* Título */
+    .hero h1 {
+    font-weight: 500 !important;
+    margin-bottom: 2rem !important;
+    }
+
+    /* Párrafo lead */
+    .hero .lead {
+    margin-bottom: 2.5rem;   /* más espacio entre párrafo y búsqueda */
+    color: var(--muted);
+    font-weight: 300 ;
+    line-height:1.1;
+    }
+
+    /* Search */
+    .search {
+    position: relative;
+    }
+
+    .controls-row {
+    margin-top: 1.2rem;               /* espacio lead → controles */
+    }
+
+
+    .search-input {
+    height: 60px;
+    padding-left: 3rem;
+    border-radius: var(--radius-pill);
+    border: var(--btn-stroke) solid var(--muted-3);
+    color: #333;
+    box-shadow: none;
+    }
+
+    .search-input::placeholder {
+    color: var(--muted-2);
+    }
+
+
+    .search-icon {position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--muted);
+    pointer-events: none;
+    }
+
+    /* Chips */
+
+    /* Botones con misma estética (chips/sign/login) */
+
+    .btn-pill{
+    border-radius:var(--radius-pill);
+    min-width: 160px;
+    font-weight: 400 !important;
+    letter-spacing:.2px;
+    }
+
+    .btn-signup{
+    background:var(--ink);
+    color:#fff;
+    border:var(--btn-stroke) solid var(--ink);
+    }
+
+    .btn-login{
+    background:transparent;
+    color:var(--ink);
+    border:var(--btn-stroke) solid var(--ink);
+    font-weight: 600 !important;
+    }
+
+    /* Botón Filtrar */
+    /* Fila: misma altura y alineados al centro */
+
+    .controls-row{
+    display:flex;
+    align-items:center;     /* 👈 centra verticalmente */
+    gap: 1rem;
+    margin-top: 1.2rem;     /* mueve el bloque completo (antes movías .search) */
+    }
+
+    /* Mantén el ancho actual del buscador */
+    .search-wrap{
+    width: var(--search-width);
+    flex: 0 0 auto;
+    }
+
+    /* Alturas idénticas */
+
+    .search-input{
+    height:60px;
+    }
+
+    .btn-filter{
+    white-space: nowrap;
+    flex: 0 0 auto;
+    height:60px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:0 1.6rem;
+    border-radius: var(--radius-pill);
+    border: var(--btn-stroke) solid var(--ink);
+    color: var(--ink);
+    background: transparent;
+    line-height: 1;
+    transition: .2s ease;
+    }
+
+    .btn-filter:hover{
+    background: var(--ink);
+    color:#fff;
+    }
+
+    /* Chips de ubicaciones, misma forma que botones */
+    .chip {
+    border-radius: var(--radius-pill);
+    padding: .35rem .9rem;
+    background: #A7ACB0;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    font-weight: 400;
+    font-size: .85rem;
+    width: 120px;
+    }
+
+    .chip i{
+    font-size:1rem;
+    color:#ffffff;
+    }
+
+    /* Correcciones generales */
+    .text-ink{
+    color:var(--ink)!important;
+    }
+
+    .text-muted-1{
+    color:var(--muted)!important;
+    }
+  </style>
+
+  {% block styles %}{% endblock %}
 </head>
+
 <body>
-    <header>
-        <nav>
-            <a href="{% url 'home' %}">InmoFinder 🏠</a>
-        </nav>
-    </header>
+  <header>
+    <nav class="container d-flex justify-content-between align-items-center">
+      <a class="brand fs-5" href="{% url 'home' %}">InmoFinder</a>
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+      <div class="d-flex align-items-center gap-3">
+        <a href="#" class="btn btn-pill btn-signup">SIGN UP</a>
+        <a href="#" class="btn btn-pill btn-login">LOGIN</a>
+      </div>
+    </nav>
+  </header>
 
-    <footer>
-        <p>© 2025 InmoFinder</p>
-    </footer>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="py-4 text-center text-muted">
+    <p class="mb-0">© 2025 InmoFinder</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,82 +1,113 @@
-
-<!DOCTYPE html>
-
+{% extends "base.html" %}
 {% load static %}
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InmoFinder</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .property-card:hover {
-            transform: translateY(-5px);
-        }
-        .carousel-item img {
-            height: 180px;
-            object-fit: cover;
-        }
-    </style>
-</head>
-<body>
 
-<div class="container mt-5">
-    {% include "partials/buscador.html" %}
-    <h1 class="mb-4 text-center">Propiedades Disponibles</h1>
+{% block title %}Home · InmoFinder{% endblock %}
 
-    {% if propiedades %}
-    <div id="carouselPropiedades" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-inner">
+{% block styles %}
+<style>
 
-            {% for propiedad in propiedades %}
-                {% if forloop.counter0|divisibleby:4 %}
-                <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                    <div class="row justify-content-center">
-                {% endif %}
+  /* Espaciados extra */
+  .hero{margin-top:var(--hero-gap);}
+  .hero .lead{margin-top:1.1rem; color:var(--muted);}
 
-                        <div class="col-md-3">
-                            <div class="card property-card shadow-sm">
-                                <a href="{% url 'detalle_propiedad' propiedad.id %}">
-                                    {% with propiedad.media.all|first as media %}
-                                        {% if media %}
-                                            <!--<img src="{{ media.archivo.url }}" class="card-img-top" alt="{{ propiedad.nombre }}"> -->
-                                            <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="{{ propiedad.nombre }}">
-                                        {% else %}
-                                            <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="Sin imagen">
-                                        {% endif %}
-                                    {% endwith %}
-                                </a>
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">{{ propiedad.nombre }}</h5>
-                                    <p class="fw-bold text-success">${{ propiedad.precio_total }}</p>
-                                    <p class="text-muted">{{ propiedad.ubicacion }}</p>
-                                </div>
-                            </div>
-                        </div>
+  /* Search más alto, más corto de ancho */
+  .search-wrap{max-width:430px;}
+  .search{position:relative;}
+  .search-input{
+    height:60px;                          /* más alto */
+    padding-left:3rem;                     /* espacio para la lupa */
+    border-radius:var(--radius-pill);
+    border:var(--btn-stroke) solid var(--muted-3);  /* más pálido que placeholder y grosor = LOGIN */
+    color:#333; box-shadow:none;
+  }
+  .search-input::placeholder{color:var(--muted-2);} /* placeholder más pálido que A8ADB1 */
 
-                {% if forloop.counter|divisibleby:4 or forloop.last %}
-                    </div>
-                </div>
-                {% endif %}
-            {% endfor %}
+  /* Lupa: color A8ADB1, perfectamente dentro del campo, sin fondo cuadrado */
+  .search-icon{
+    position:absolute; left:14px; top:50%; transform:translateY(-50%);
+    display:inline-flex; width:28px; height:28px; align-items:center; justify-content:center;
+    border-radius:50%; background:transparent;        /* evita bloque cuadrado */
+    color:var(--muted);                               /* A8ADB1 */
+    pointer-events:none;
+  }
+
+  /* Botones más largos y tipografía más pequeña */
+  .btn-pill{padding:.7rem 1.9rem; font-size:.95rem;}
+  /* Chips en la misma estética + separación extra */
+  .chips{gap:.5rem;}
+  .chips .chip{font-size:.95rem;}
+
+  /* Microespacios entre bloques del hero */
+  .space-h1-lead{margin-top:1.4rem;}          /* entre h1 y lead (Find, publish...) */
+  .space-lead-search{margin-top:1.6rem;}      /* entre lead y búsqueda */
+  .space-search-chips{margin-top:1.2rem;}     /* entre búsqueda y ubicaciones */
+
+  /* Imagen con bordes redondeados grandes */
+  .hero-img{border-radius:24px;}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="container hero">
+  <div class="row align-items-center">
+    <!-- Lado izquierdo -->
+    <div class="col-lg-6">
+      <h1 class="display-5 mb-0 text-ink">
+        Smart real estate platform for buyers, sellers, and agents.
+      </h1>
+
+      <p class="lead space-h1-lead text-muted-1">
+        Find, publish, and manage properties with ease. Our platform connects buyers, renters,
+        and real estate professionals through verified listings, smart search filters,
+        and secure communication tools.
+      </p>
+
+      <div class="controls-row">
+        <div class="search-wrap">
+            <form method="get" action="{% url 'buscar_propiedades' %}" class="search position-relative">
+                <span class="search-icon"><i class="bi bi-search"></i></span>
+                <input class="form-control search-input" type="text" name="q" placeholder="Start looking">
+            </form>
         </div>
+        <form id="sortFormHome" method="get" action="{% url 'buscar_propiedades' %}" class="ms-2">
+            <input type="hidden" name="q" id="qHiddenHome">
+            <select class="btn btn-filter form-select d-inline-block" name="orden" onchange="document.getElementById('sortFormHome').submit()" style="width:auto;">
+                <option value="">Sort by</option>
+                <option value="recientes">Most recent</option>
+                <option value="precio_asc">Price ↑</option>
+                <option value="precio_desc">Price ↓</option>
+                <option value="area_asc">Area ↑</option>
+                <option value="area_desc">Area ↓</option>
+            </select>
+        </form>
+      </div>
 
-        <!-- Controles del carrusel -->
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselPropiedades" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselPropiedades" data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
-        </button>
+      <script>
+          /* si el usuario escribe en la barra y luego usa Sort by, preserva ese texto:*/
+
+          const searchInput = document.querySelector('.search-input');
+          const qHiddenHome = document.getElementById('qHiddenHome');
+          if (searchInput && qHiddenHome) {
+                searchInput.addEventListener('input', () => { qHiddenHome.value = searchInput.value; });
+          }
+      </script>
+
+
+      <!-- Chips de ubicaciones -->
+      <div class="d-flex flex-wrap chips space-search-chips">
+        <span class="chip"><i class="bi bi-geo-alt"></i> Poblado</span>
+        <span class="chip"><i class="bi bi-geo-alt"></i> Envigado</span>
+        <span class="chip"><i class="bi bi-geo-alt"></i> Laureles</span>
+        <span class="chip"><i class="bi bi-geo-alt"></i> Sabaneta</span>
+        <span class="chip"><i class="bi bi-geo-alt"></i> Bello</span>
+      </div>
     </div>
-    {% else %}
-    <p class="text-center">No hay propiedades disponibles.</p>
-    {% endif %}
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <!-- Lado derecho -->
+    <div class="col-lg-6 text-center mt-5 mt-lg-0">
+      <img src="{% static 'images/default.jpg' %}" alt="Casa moderna" class="img-fluid shadow hero-img">
+    </div>
+  </div>
+</section>
+{% endblock %}

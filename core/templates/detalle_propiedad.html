@@ -18,35 +18,30 @@
 
     <!-- Galería tipo slider -->
     <div class="galeria">
-        {% if propiedad.mediapropiedad_set.exists %}
-        <div class="slider">
-            {% for media in propiedad.mediapropiedad_set.all %}
-                {% if media.tipo == "imagen" %}
-                    <div class="slide">
-                        {% if media.archivo %}
-                            <img src="{{ media.archivo.url }}" alt="{{ propiedad.nombre }}">
-                        {% else %}
-                            <img src="{% static 'images/default.jpg' %}" alt="Sin imagen disponible">
-                        {% endif %}
-                    </div>
-                {% elif media.tipo == "video" %}
-                    <div class="slide">
-                        <video controls>
-                            {% if media.archivo %}
-                                <source src="{{ media.archivo.url }}" type="video/mp4">
-                            {% else %}
-                                <source src="{% static 'images/muestra.mp4' %}" type="video/mp4", alt="Sin video disponible">
-                            {% endif %}
-                            Tu navegador no soporta video.
+        {% if media_validas %}
+            {% for m in media_validas %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    {% if m.es_video %}
+                        <video class="d-block w-100" controls style="max-height:400px; object-fit:cover;">
+                            <source src="{{ m.archivo.url }}" type="video/mp4">
                         </video>
-                    </div>
-                {% endif %}
+                    {% else %}
+                        <img src="{{ m.archivo.url }}" class="d-block w-100" alt="{{ propiedad.nombre }}" style="max-height:400px; object-fit:cover;">
+                    {% endif %}
+                </div>
             {% endfor %}
-        </div>
         {% else %}
-            <img src="{% static 'images/default.jpg' %}" class="d-block w-100" alt="Sin imagen" style="max-height: 400px; object-fit: cover;">
+            <div class="carousel-item active">
+                <img src="{% static 'images/default.jpg' %}" class="d-block w-100" alt="Sin imagen" style="max-height: 400px; object-fit: cover;">
+            </div>
         {% endif %}
     </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#galeriaPropiedad" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#galeriaPropiedad" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
 
     <!-- Información de la propiedad -->
     <div class="info-propiedad">
