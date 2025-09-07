@@ -1,15 +1,34 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.db.models import Q, Prefetch
 from .models import Propiedad, MediaPropiedad
-from django.utils.dateparse import parse_date
+from django.contrib.auth import login, logout
+from django.views.generic.edit import FormView
+from django.contrib.auth.views import LoginView as AuthLoginView
+from .forms import RegisterForm, LoginForm
 
 def home(request):
-    # Muestra últimas propiedades (o redirige a buscar)
     qs = Propiedad.objects.all().order_by('-fecha_disponibilidad')[:12]
     media_prefetch = Prefetch('media', queryset=MediaPropiedad.objects.exclude(archivo__isnull=True).exclude(archivo="").order_by('id'))
     qs = qs.prefetch_related(media_prefetch)
     return render(request, "home.html", {"propiedades": qs})
+
+class LoginView(AuthLoginView):
+    template_name = "auth/login.html"
+    authentication_form = LoginForm
+
+def logout_view(request):
+    logout(request)
+    return redirect("home")
+
+class RegisterView(FormView):
+    template_name = "auth/register.html"
+    form_class = RegisterForm
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect("home")
 
 def buscar_propiedades(request):
     propiedades = Propiedad.objects.all()
@@ -31,11 +50,6 @@ def buscar_propiedades(request):
     if precio_max:
         propiedades = propiedades.filter(precio_total__lte=precio_max)
 
-    disponibilidad = request.GET.get("disponibilidad")
-    if disponibilidad:
-        # fecha_disponibilidad >= disponibilidad
-        propiedades = propiedades.filter(fecha_disponibilidad__date__gte=parse_date(disponibilidad))
-
     habitaciones = request.GET.get("habitaciones")
     if habitaciones:
         propiedades = propiedades.filter(habitaciones=habitaciones)
@@ -48,7 +62,6 @@ def buscar_propiedades(request):
     if parqueaderos:
         propiedades = propiedades.filter(parqueaderos=parqueaderos)
 
-    # Rango de área (si lo agregas en el formulario)
     area_min = request.GET.get("area_min")
     area_max = request.GET.get("area_max")
     if area_min:
@@ -56,20 +69,17 @@ def buscar_propiedades(request):
     if area_max:
         propiedades = propiedades.filter(area__lte=area_max)
 
-    # Otros
     tipo = request.GET.get("tipo")
     if tipo:
         propiedades = propiedades.filter(tipo=tipo)
 
     if request.GET.get("garaje") == "1":
         propiedades = propiedades.filter(garaje=True)
-
     if request.GET.get("mascotas") == "1":
         propiedades = propiedades.filter(mascotas=True)
 
     # Orden
-    # Orden
-    orden = request.GET.get("orden", "recientes")  # por defecto: recientes
+    orden = request.GET.get("orden")
     mapping = {
         "precio_asc": "precio_total",
         "precio_desc": "-precio_total",
@@ -77,13 +87,14 @@ def buscar_propiedades(request):
         "area_desc": "-area",
         "recientes": "-fecha_disponibilidad",
     }
-    propiedades = propiedades.order_by(mapping.get(orden, "-fecha_disponibilidad"))
+    if orden in mapping:
+        propiedades = propiedades.order_by(mapping[orden])
 
     # Prefetch media + paginación
     media_prefetch = Prefetch('media', queryset=MediaPropiedad.objects.exclude(archivo__isnull=True).exclude(archivo="").order_by('id'))
     propiedades = propiedades.prefetch_related(media_prefetch)
 
-    paginator = Paginator(propiedades, 12)  # 12 por página
+    paginator = Paginator(propiedades, 12)
     page = request.GET.get("page")
     page_obj = paginator.get_page(page)
 

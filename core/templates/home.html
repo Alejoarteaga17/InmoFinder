@@ -110,4 +110,66 @@
     </div>
   </div>
 </section>
+
+
+<!-- ============================= -->
+<!-- Incluimos el buscador -->
+<!-- ============================= -->
+{% include "partials/buscador.html" %}
+
+<!-- ============================= -->
+<!-- Carrusel de propiedades -->
+<!-- ============================= -->
+<h1 class="mb-4 text-center">Propiedades Disponibles</h1>
+
+{% if propiedades %}
+<div id="carouselPropiedades" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+
+        {% for propiedad in propiedades %}
+            {% if forloop.counter0|divisibleby:4 %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="row justify-content-center">
+            {% endif %}
+
+                    <div class="col-md-3">
+                        <div class="card property-card shadow-sm">
+                            <a href="{% url 'detalle_propiedad' propiedad.id %}">
+                                {% with propiedad.media.all|first as media %}
+                                    {% if media %}
+                                        <!-- Aquí deberías mostrar la imagen real -->
+                                        <!-- <img src="{{ media.archivo.url }}" class="card-img-top" alt="{{ propiedad.nombre }}"> -->
+                                        <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="{{ propiedad.nombre }}">
+                                    {% else %}
+                                        <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="Sin imagen">
+                                    {% endif %}
+                                {% endwith %}
+                            </a>
+                            <div class="card-body text-center">
+                                <h5 class="card-title">{{ propiedad.nombre }}</h5>
+                                <p class="fw-bold text-success">${{ propiedad.precio_total }}</p>
+                                <p class="text-muted">{{ propiedad.ubicacion }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+            {% if forloop.counter|divisibleby:4 or forloop.last %}
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Controles del carrusel -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselPropiedades" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselPropiedades" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+</div>
+{% else %}
+<p class="text-center">No hay propiedades disponibles.</p>
+{% endif %}
+
 {% endblock %}

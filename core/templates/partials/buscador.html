@@ -1,0 +1,58 @@
+<!-- Barra de búsqueda -->
+<form method="get" action="{% url 'buscar_propiedades' %}" class="search-bar mb-3">
+    <input type="text" name="q" placeholder="🔍 Buscar por ubicación, nombre o descripción" class="form-control" style="max-width:400px; display:inline-block;">
+    <button type="submit" class="btn btn-primary">Buscar</button>
+</form>
+
+<!-- Filtros adicionales -->
+<form method="get" action="{% url 'buscar_propiedades' %}" class="row g-2 filters mb-4">
+
+    <div class="col-md-2">
+        <input type="number" name="precio_min" class="form-control" placeholder="Precio mín.">
+    </div>
+    <div class="col-md-2">
+        <input type="number" name="precio_max" class="form-control" placeholder="Precio máx.">
+    </div>
+    <div class="col-md-2">
+        <input type="number" name="habitaciones" class="form-control" placeholder="Habitaciones">
+    </div>
+    <div class="col-md-2">
+        <input type="number" name="banos" class="form-control" placeholder="Baños">
+    </div>
+    <div class="col-md-2">
+        <input type="number" name="parqueaderos" class="form-control" placeholder="Parqueaderos">
+    </div>
+    <div class="col-md-2">
+        <input type="number" name="area_min" class="form-control" placeholder="Área mín. (m²)">
+    </div>
+    <div class="col-md-2">
+        <input type="number" name="area_max" class="form-control" placeholder="Área máx. (m²)">
+    </div>
+    <div class="col-md-2">
+        <select name="tipo" class="form-select">
+            <option value="">Tipo</option>
+            <option value="Piso">Piso</option>
+            <option value="Casa">Casa</option>
+            <option value="Chalet">Chalet</option>
+            <option value="Ático">Ático</option>
+            <option value="Dúplex">Dúplex</option>
+            <option value="Estudio">Estudio</option>
+            <option value="Loft">Loft</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <input type="date" name="disponibilidad" class="form-control">
+    </div>
+    <div class="col-md-2 form-check">
+        <input type="checkbox" class="form-check-input" name="garaje" value="1">
+        <label class="form-check-label">Garaje</label>
+    </div>
+    <div class="col-md-2 form-check">
+        <input type="checkbox" class="form-check-input" name="mascotas" value="1">
+        <label class="form-check-label">Mascotas</label>
+    </div>
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-success">Aplicar filtros</button>
+    </div>
+</form>

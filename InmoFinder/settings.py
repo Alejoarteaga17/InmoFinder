@@ -127,3 +127,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = "login"                # Si alguien intenta entrar a una vista protegida, lo manda al login
+LOGIN_REDIRECT_URL = "home"        # Después de iniciar sesión, lo manda al home
+LOGOUT_REDIRECT_URL = "home"       # Después de hacer logout, lo manda al home

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="row g-0">
+          <div class="col-md-6 p-4 border-end">
+            <h3 class="text-center mb-3">Sign Up</h3>
+            <p class="text-center text-muted">Crea tu cuenta</p>
+            <form method="post">
+              {% csrf_token %}
+              <div class="mb-3">
+                {{ form.username }}
+              </div>
+              <div class="mb-3">
+                {{ form.email }}
+              </div>
+              <div class="mb-3">
+                {{ form.password1 }}
+              </div>
+              <div class="mb-3">
+                {{ form.password2 }}
+              </div>
+              <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-success">Registrarse</button>
+              </div>
+              <p class="text-center small">
+                ¿Ya tienes cuenta?
+                <a href="{% url 'login' %}">Login</a>
+              </p>
+            </form>
+          </div>
+          <div class="col-md-6 bg-light p-4 d-flex flex-column justify-content-center text-center">
+            <h4 class="mb-3">Bienvenido 👋</h4>
+            <p class="text-muted">Ya tienes cuenta? Inicia sesión para continuar.</p>
+            <a href="{% url 'login' %}" class="btn btn-outline-primary">Login</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
