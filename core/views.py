@@ -102,5 +102,5 @@ def buscar_propiedades(request):
 
 def detalle_propiedad(request, propiedad_id):
     propiedad = get_object_or_404(Propiedad.objects.prefetch_related('media'), pk=propiedad_id)
-    media_validas = [m for m in propiedad.media.all() if m.archivo]
+    media_validas = [m for m in propiedad.media.all() if m.archivo]  # type: ignore
     return render(request, "detalle_propiedad.html", {"propiedad": propiedad, "media_validas": media_validas})

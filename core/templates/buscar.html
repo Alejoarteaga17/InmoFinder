@@ -2,36 +2,50 @@
 {% load static %}
 
 {% block content %}
-    <h1 class="mb-4 text-center">Buscar Propiedades</h1>
+<section class="container py-4">
 
-    <!-- Incluimos el buscador -->
+<h1 class="mb-4 text-center">Buscar Propiedades</h1>
+
+<!-- Buscador -->
+<div class="d-flex justify-content-center mb-4">
     {% include "partials/buscador.html" %}
+</div>
 
-    <hr>
+<h2 class="mb-4 text-center">Resultados</h2>
 
-    <h2 class="mb-4">Resultados</h2>
-    <div class="row">
-        {% for propiedad in propiedades %}
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm h-100">
+<div class="row">
+    {% for propiedad in propiedades %}
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100 property-card">
+            <a href="{% url 'detalle_propiedad' propiedad.id %}" 
+                class="view-property" 
+                data-bs-toggle="modal" 
+                data-bs-target="#propertyModal">
                 {% if propiedad.media.first %}
-                    <!-- Si tienes imágenes reales: <img src="{{ propiedad.media.first.archivo.url }}" class="card-img-top" alt="{{ propiedad.nombre }}"> -->
+                    <!-- Con imágenes reales sería así: -->
+                    <!-- <img src="{{ propiedad.media.first.archivo.url }}" class="card-img-top" alt="{{ propiedad.nombre }}"> -->
                     <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="{{ propiedad.nombre }}">
                 {% else %}
                     <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="Sin imagen">
                 {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ propiedad.nombre }}</h5>
-                    <p class="fw-bold text-success">$ {{ propiedad.precio_total|floatformat:0 }} COP</p>
-                    <p class="text-muted">${{ propiedad.precio_m2|floatformat:0 }} COP/m²</p>
-                    <p class="text-muted">📍 {{ propiedad.ubicacion }}</p>
-                    <p class="text-muted">{{ propiedad.descripcion|truncatewords:15 }}</p>
-                    <a href="{% url 'detalle_propiedad' propiedad.id %}" class="btn btn-primary">Ver más</a>
-                </div>
+            </a>
+            <div class="card-body text-center">
+                <h5 class="card-title">{{ propiedad.nombre }}</h5>
+                <p class="fw-bold text-success">$ {{ propiedad.precio_total|floatformat:0 }} COP</p>
+                <p class="text-muted">💵 ${{ propiedad.precio_m2|floatformat:0 }} COP/m²</p>
+                <p class="text-muted">📍 {{ propiedad.ubicacion }}</p>
+                <p class="card-text text-truncate" 
+                    style="-webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; display:-webkit-box;">
+                    {{ propiedad.descripcion }}
+                </p>
             </div>
         </div>
-        {% empty %}
-        <p class="text-center">No se encontraron propiedades.</p>
-        {% endfor %}
     </div>
+    {% empty %}
+    <p class="text-center">No se encontraron propiedades.</p>
+    <a class="text-center" href="{% url 'home' %}">Volver al inicio</a>
+    {% endfor %}
+</div>
+
+</section>
 {% endblock %}

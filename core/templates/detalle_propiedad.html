@@ -1,73 +1,66 @@
-{% extends "base.html" %}
 {% load static %}
-{% block content %}
-<style>
-    .slider {
-        display: flex;
-        overflow-x: auto;
-        gap: 16px;
-        scroll-behavior: smooth;
-    }
-    .slide {
-        min-width: 300px;
-        flex-shrink: 0;
-    }
-</style>
 
-<div class="detalle-propiedad">
+<div class="modal-header">
+    <h5 class="modal-title">{{ propiedad.nombre }}</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+</div>
+
+<div class="modal-body detalle-propiedad">
 
     <!-- Galería tipo slider -->
-    <div class="galeria">
-        {% if media_validas %}
-            {% for m in media_validas %}
-                <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                    {% if m.es_video %}
-                        <video class="d-block w-100" controls style="max-height:400px; object-fit:cover;">
-                            <source src="{{ m.archivo.url }}" type="video/mp4">
+    <div class="galeria mb-3">
+        {% if propiedad.mediapropiedad_set.exists %}
+        <div class="slider">
+            {% for media in propiedad.mediapropiedad_set.all %}
+                {% if media.tipo == "imagen" %}
+                    <div class="slide">
+                        {% if media.archivo %}
+                            <img src="{{ media.archivo.url }}" class="img-fluid rounded" alt="{{ propiedad.nombre }}">
+                        {% else %}
+                            <img src="{% static 'images/default.jpg' %}" class="img-fluid rounded" alt="Sin imagen disponible">
+                        {% endif %}
+                    </div>
+                {% elif media.tipo == "video" %}
+                    <div class="slide">
+                        <video controls class="w-100 rounded">
+                            {% if media.archivo %}
+                                <source src="{{ media.archivo.url }}" type="video/mp4">
+                            {% else %}
+                                <source src="{% static 'images/muestra.mp4' %}" type="video/mp4">
+                            {% endif %}
+                            Tu navegador no soporta video.
                         </video>
-                    {% else %}
-                        <img src="{{ m.archivo.url }}" class="d-block w-100" alt="{{ propiedad.nombre }}" style="max-height:400px; object-fit:cover;">
-                    {% endif %}
-                </div>
+                    </div>
+                {% endif %}
             {% endfor %}
+        </div>
         {% else %}
-            <div class="carousel-item active">
-                <img src="{% static 'images/default.jpg' %}" class="d-block w-100" alt="Sin imagen" style="max-height: 400px; object-fit: cover;">
-            </div>
+            <img src="{% static 'images/default.jpg' %}" class="img-fluid rounded w-100" alt="Sin imagen">
         {% endif %}
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#galeriaPropiedad" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#galeriaPropiedad" data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
-    </button>
 
     <!-- Información de la propiedad -->
     <div class="info-propiedad">
-        <h1>{{ propiedad.nombre }}</h1>
-        <p class="price">$ {{ propiedad.precio_total|floatformat:0 }} COP</p>
-        <p class="price-m2">${{ propiedad.precio_m2|floatformat:0 }} COP/m²</p>
-        <p class="location">📍 {{ propiedad.ubicacion }}</p>
+        <p class="fw-bold text-success">Precio Total: $ {{ propiedad.precio_total|floatformat:0 }} COP</p>
+        <p class="text-muted">Precio por metro: ${{ propiedad.precio_m2|floatformat:0 }} COP/m²</p>
+        <p class="text-muted">📍 {{ propiedad.ubicacion }}</p>
 
-        <ul class="detalles">
+        <ul class="list-unstyled small">
             <li><b>Área:</b> {{ propiedad.area }} m²</li>
             <li><b>Habitaciones:</b> {{ propiedad.habitaciones }}</li>
-            <li><b>Baños:</b> {{ propiedad.bannos }}</li>
+            <li><b>Baños:</b> {{ propiedad.banos }}</li>
             <li><b>Parqueaderos:</b> {{ propiedad.parqueaderos }}</li>
             <li><b>Garaje:</b> {% if propiedad.garaje %}Sí{% else %}No{% endif %}</li>
             <li><b>Mascotas:</b> {% if propiedad.mascotas %}Permitidas{% else %}No permitidas{% endif %}</li>
             <li><b>Disponibilidad:</b> {{ propiedad.fecha_disponibilidad }}</li>
         </ul>
 
-        <h3>Descripción</h3>
+        <h6>Descripción</h6>
         <p>{{ propiedad.descripcion }}</p>
 
         {% if propiedad.zonas_comunes %}
-        <h3>Zonas comunes</h3>
+        <h6>Zonas comunes</h6>
         <p>{{ propiedad.zonas_comunes }}</p>
         {% endif %}
     </div>
-
 </div>
-{% endblock %}
