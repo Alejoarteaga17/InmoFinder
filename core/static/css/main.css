@@ -1,161 +1,157 @@
 :root {
-  --ink: #444444;          /* texto fuerte + btn SIGN UP */
-  --muted: #A8ADB1;        /* “InmoFinder” (gris), párrafo, lupa */
-  --muted-2: #B5B9BD;      /* placeholder */
-  --muted-3: #C6CACD;      /* borde búsqueda */
-  --radius-pill: 999px;
-  --btn-stroke: 2px;       /* grosor igual al de LOGIN */
-  --header-pt: 2.25rem;
-  --header-pb: 2rem;
-  --hero-gap: 5rem;
-  --search-width: 280px;
+--ink: #444444;          /* texto fuerte + btn SIGN UP */
+--muted: #A8ADB1;        /* “InmoFinder” (gris), párrafo, lupa */
+--muted-2: #B5B9BD;      /* placeholder */
+--muted-3: #C6CACD;      /* borde búsqueda */
+--radius-pill: 999px;
+--btn-stroke: 2px;       /* grosor igual al de LOGIN */
+--header-pt: 2.25rem;
+--header-pb: 2rem;
+--hero-gap: 5rem;
+--search-width: 280px;
 }
 
 html, body {
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji", "Segoe UI Symbol";
-  background: #fff;
+font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji", "Segoe UI Symbol";
+background: #fff;
 }
 
 /* Header */
 header {
-  padding-top: var(--header-pt);
-  padding-bottom: var(--header-pb);
+padding-top: var(--header-pt);
+padding-bottom: var(--header-pb);
 }
 
 /* Marca */
 .brand {
-  color: #828282 !important;
-  font-weight: 400 !important;
-  letter-spacing: .2px;
-  text-decoration: none;
-  font-size: 1.75rem !important;
+color: #828282 !important;
+font-weight: 400 !important;
+letter-spacing: .2px;
+text-decoration: none;
+font-size: 1.75rem !important;
 }
 
 /* HERO */
 .hero {
-  margin-top: var(--hero-gap);
-  margin-bottom: 15rem;
+margin-top: var(--hero-gap);
+margin-bottom: 15rem;
 }
 
 .hero h1 {
-  font-weight: 500 !important;
-  margin-bottom: 2rem !important;
+font-weight: 500 !important;
+margin-bottom: 2rem !important;
 }
 
 .hero .lead {
-  margin-bottom: 2.5rem;
-  color: var(--muted);
-  font-weight: 300;
-  line-height: 1.1;
+margin-bottom: 2.5rem;
+color: var(--muted);
+font-weight: 300;
+line-height: 1.1;
 }
 
 /* Search */
 .search {
-  position: relative;
+position: relative;
 }
 
 .controls-row {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 1.2rem;
+display: flex;
+align-items: center;
+gap: 1rem;
+margin-top: 1.2rem;
 }
 
 .search-wrap {
-  width: var(--search-width);
-  flex: 0 0 auto;
+width: var(--search-width);
+flex: 0 0 auto;
 }
 
 .search-input {
-  height: 60px;
-  padding-left: 3rem;
-  border-radius: var(--radius-pill);
-  border: var(--btn-stroke) solid var(--muted-3);
-  color: #333;
-  box-shadow: none;
+height: 60px;
+padding-left: 3rem;
+border-radius: var(--radius-pill);
+border: var(--btn-stroke) solid var(--muted-3);
+color: #333;
+box-shadow: none;
 }
 
 .search-input::placeholder {
-  color: var(--muted-2);
+color: var(--muted-2);
 }
 
 .search-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: inline-flex;
-  width: 28px;
-  height: 28px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--muted);
-  pointer-events: none;
+position: absolute;
+left: 14px;
+top: 50%;
+transform: translateY(-50%);
+display: inline-flex;
+width: 28px;
+height: 28px;
+align-items: center;
+justify-content: center;
+border-radius: 50%;
+background: transparent;
+color: var(--muted);
+pointer-events: none;
 }
 
 /* Botones */
 .btn-pill {
-  border-radius: var(--radius-pill);
-  min-width: 160px;
-  font-weight: 400 !important;
-  letter-spacing: .2px;
+border-radius: var(--radius-pill);
+min-width: 160px;
+font-weight: 400 !important;
+letter-spacing: .2px;
 }
 
 .btn-signup {
-  background: var(--ink);
-  color: #fff;
-  border: var(--btn-stroke) solid var(--ink);
+background: var(--ink);
+color: #fff;
+border: var(--btn-stroke) solid var(--ink);
 }
 
 .btn-login {
-  background: transparent;
-  color: var(--ink);
-  border: var(--btn-stroke) solid var(--ink);
-  font-weight: 600 !important;
+background: transparent;
+color: var(--ink);
+border: var(--btn-stroke) solid var(--ink);
+font-weight: 600 !important;
 }
 
 .btn-filter {
-  white-space: nowrap;
-  flex: 0 0 auto;
-  height: 60px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 1.6rem;
-  border-radius: var(--radius-pill);
-  border: var(--btn-stroke) solid var(--ink);
-  color: var(--ink);
-  background: transparent;
-  line-height: 1;
-  transition: .2s ease;
+white-space: nowrap;
+flex: 0 0 auto;
+height: 60px;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+padding: 0 1.6rem;
+border-radius: var(--radius-pill);
+border: var(--btn-stroke) solid var(--ink);
+color: var(--ink);
+background: transparent;
+line-height: 1;
+transition: .2s ease;
 }
 
 .btn-filter:hover {
-  background: var(--ink);
-  color: #fff;
+background: var(--ink);
+color: #fff;
 }
 
 /* Chips */
-.chip {
-  border-radius: var(--radius-pill);
-  padding: .35rem .9rem;
-  background: #A7ACB0;
-  color: #ffffff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: .4rem;
-  font-weight: 400;
-  font-size: .85rem;
-  width: 120px;
-}
 
-.chip i {
-  font-size: 1rem;
-  color: #ffffff;
-}
+/* Botones más largos y tipografía más pequeña */
+.btn-pill{padding:.7rem 1.9rem; font-size:.95rem;}
+/* Chips en la misma estética + separación extra */
+.chips{gap:.5rem;}
+.chips .chip{font-size:.95rem;}
+
+/* Microespacios entre bloques del hero */
+.space-h1-lead{margin-top:1.4rem;}          /* entre h1 y lead (Find, publish...) */
+.space-lead-search{margin-top:1.6rem;}      /* entre lead y búsqueda */
+.space-search-chips{margin-top:1.2rem;}     /* entre búsqueda y ubicaciones */
+
+/* Imagen con bordes redondeados grandes */
+.hero-img{border-radius:24px;}
 
 /* Utilidades */
 .text-ink { color: var(--ink) !important; }
