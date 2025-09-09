@@ -34,12 +34,12 @@ def buscar_propiedades(request):
     propiedades = Propiedad.objects.all()
 
     # Texto libre
-    q = request.GET.get("q")
-    if q:
+    search = request.GET.get("search")
+    if search:
         propiedades = propiedades.filter(
-            Q(nombre__icontains=q) |
-            Q(descripcion__icontains=q) |
-            Q(ubicacion__icontains=q)
+            Q(nombre__icontains=search) |
+            Q(descripcion__icontains=search) |
+            Q(ubicacion__icontains=search)
         )
 
     # Filtros numéricos

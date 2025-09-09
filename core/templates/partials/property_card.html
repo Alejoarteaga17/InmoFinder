@@ -1,0 +1,29 @@
+{% load static %}
+<div class="col-md-3 mb-4">
+  <div class="card property-card shadow-sm h-100">
+    <a href="{% url 'detalle_propiedad' propiedad.id %}" 
+        class="view-property" 
+        data-bs-toggle="modal" 
+        data-bs-target="#propertyModal">
+        {% if propiedad.media.first %}
+            <!-- cuando haya imágenes reales -->
+            <!-- <img src="{{ propiedad.media.first.archivo.url }}" class="card-img-top" alt="{{ propiedad.nombre }}"> -->
+            <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="{{ propiedad.nombre }}">
+        {% else %}
+            <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="Sin imagen">
+        {% endif %}
+    </a>
+    <div class="card-body text-center">
+      <h5 class="card-title">{{ propiedad.nombre }}</h5>
+      <p class="fw-bold text-dark mb-1">${{ propiedad.precio_total|floatformat:0 }} COP</p>
+      <span class="price-m2-badge d-inline-block mb-2">
+        ${{ propiedad.precio_m2|floatformat:0 }} COP/m²
+      </span>
+      <p class="text-muted">📍 {{ propiedad.ubicacion }}</p>
+      <p class="card-text text-truncate"
+         style="-webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; display:-webkit-box;">
+         {{ propiedad.descripcion }}
+      </p>
+    </div>
+  </div>
+</div>

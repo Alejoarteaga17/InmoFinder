@@ -19,6 +19,12 @@ class RegisterForm(UserCreationForm):
         self.fields["password2"].widget.attrs.update({"class": "form-control", "placeholder": "Repite la contraseña"})
         self.fields["email"].widget.attrs.update({"class": "form-control", "placeholder": "Correo electrónico"})
 
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Este correo ya está registrado.")
+        return email
+
 
 class LoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):

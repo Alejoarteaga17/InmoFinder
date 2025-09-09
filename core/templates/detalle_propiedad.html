@@ -42,7 +42,12 @@
     <!-- Información de la propiedad -->
     <div class="info-propiedad">
         <p class="fw-bold text-success">Precio Total: $ {{ propiedad.precio_total|floatformat:0 }} COP</p>
-        <p class="text-muted">Precio por metro: ${{ propiedad.precio_m2|floatformat:0 }} COP/m²</p>
+        <p>
+            <span class="price-m2-badge">
+                ${{ propiedad.precio_m2|floatformat:0 }} COP/m²
+            </span>
+        </p>
+
         <p class="text-muted">📍 {{ propiedad.ubicacion }}</p>
 
         <ul class="list-unstyled small">

@@ -1,11 +1,6 @@
-<!-- Barra de búsqueda 
-<form method="get" action="{% url 'buscar_propiedades' %}" class="search-bar mb-3">
-    <input type="text" name="q" placeholder="🔍 Buscar por ubicación, nombre o descripción" class="form-control" style="max-width:400px; display:inline-block;">
-    <button type="submit" class="btn btn-primary">Buscar</button>
-</form>
--->
+
 <!-- Filtros adicionales -->
-<form method="get" action="{% url 'buscar_propiedades' %}" class="row g-2 filters mb-4">
+<form method="get" action="{% url 'buscar_propiedades' %}" class="row g-2 filters mb-4 alineado-filtros">
 
     <div class="col-md-2">
         <input type="number" min="1" name="precio_min" class="form-control" placeholder="Precio mín.">
@@ -50,6 +45,7 @@
     </div>
 
     <div class="col-12 d-flex justify-content-end">
-        <button type="submit" class="btn btn-success" style="color #454545">Aplicar filtros</button>
+        <button type="submit" class="btn btn-success btn-pill">Aplicar filtros</button>
+
     </div>
 </form>

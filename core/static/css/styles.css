@@ -9,11 +9,11 @@
 .filters select,
 .filters input,
 .filters button {
-    padding: 8px 14px;
+    padding: 12px 18px;  /* más alto y ancho */
     border: 1px solid #ccc;
-    border-radius: 20px;
+    border-radius: 25px; /* más redondeado */
     background: #fff;
-    font-size: 14px;
+    font-size: 15px;     /* texto un poquito más grande */
     cursor: pointer;
 }
 
