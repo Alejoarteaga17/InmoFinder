@@ -5,6 +5,8 @@ from .models import Propiedad, MediaPropiedad
 from django.contrib.auth import login, logout
 from django.views.generic.edit import FormView
 from django.contrib.auth.views import LoginView as AuthLoginView
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .forms import RegisterForm, LoginForm
 
 def home(request):
@@ -104,3 +106,26 @@ def detalle_propiedad(request, propiedad_id):
     propiedad = get_object_or_404(Propiedad.objects.prefetch_related('media'), pk=propiedad_id)
     media_validas = [m for m in propiedad.media.all() if m.archivo]  # type: ignore
     return render(request, "detalle_propiedad.html", {"propiedad": propiedad, "media_validas": media_validas})
+
+@login_required
+def contact_owner(request, propiedad_id):
+    propiedad = get_object_or_404(Propiedad, id=propiedad_id)
+
+    if request.method == "POST":
+        name = request.POST.get("name")
+        phone = request.POST.get("phone")
+        email = request.POST.get("email")
+        message = request.POST.get("message")
+
+        # Aquí puedes guardar en BD o enviar un correo
+        messages.success(request, "Your message has been sent to the owner!")
+        return redirect("detalle_propiedad", propiedad_id=propiedad.id)
+
+    return render(request, "detalle_propiedad.html", {"propiedad": propiedad})
+
+
+# 🚨 Nueva vista: solo devuelve el formulario en HTML
+@login_required
+def contact_form(request, propiedad_id):
+    propiedad = get_object_or_404(Propiedad, id=propiedad_id)
+    return render(request, "partials/contact_form.html", {"propiedad": propiedad})
