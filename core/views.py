@@ -8,6 +8,10 @@ from django.contrib.auth.views import LoginView as AuthLoginView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import RegisterForm, LoginForm
+from .forms import ContactForm
+from django.http import JsonResponse
+from django.core.mail import send_mail
+
 
 def home(request):
     qs = Propiedad.objects.all().order_by('-fecha_disponibilidad')[:12]
@@ -103,29 +107,67 @@ def buscar_propiedades(request):
     return render(request, "buscar.html", {"propiedades": page_obj})
 
 def detalle_propiedad(request, propiedad_id):
-    propiedad = get_object_or_404(Propiedad.objects.prefetch_related('media'), pk=propiedad_id)
-    media_validas = [m for m in propiedad.media.all() if m.archivo]  # type: ignore
-    return render(request, "detalle_propiedad.html", {"propiedad": propiedad, "media_validas": media_validas})
+    propiedad = get_object_or_404(Propiedad, id=propiedad_id)
+    if request.GET.get("modal") == "1":
+        return render(request, "partials/propiedad_modal.html", {"propiedad": propiedad})
+    return render(request, "detalle_propiedad.html", {"propiedad": propiedad})
 
 @login_required
 def contact_owner(request, propiedad_id):
     propiedad = get_object_or_404(Propiedad, id=propiedad_id)
 
     if request.method == "POST":
-        name = request.POST.get("name")
-        phone = request.POST.get("phone")
-        email = request.POST.get("email")
-        message = request.POST.get("message")
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            # Aquí pondrás la lógica de guardar/enviar correo
+            '''if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({
+                    "success": True,
+                    "message": "Mensaje enviado correctamente"
+                })'''
+            messages.success(request, "✅ Your message has been sent!")
+            return redirect("home")   # 👈 si no es AJAX, redirige al home
+        else:
+            '''if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({"success": False, "errors": form.errors}, status=400)'''
+            messages.error(request, "❌ Please correct the errors below.")
+            return redirect("detalle_propiedad", propiedad_id=propiedad_id)
 
-        # Aquí puedes guardar en BD o enviar un correo
-        messages.success(request, "Your message has been sent to the owner!")
-        return redirect("detalle_propiedad", propiedad_id=propiedad.id)
-
-    return render(request, "detalle_propiedad.html", {"propiedad": propiedad})
+    return redirect("home")
 
 
 # 🚨 Nueva vista: solo devuelve el formulario en HTML
 @login_required
 def contact_form(request, propiedad_id):
     propiedad = get_object_or_404(Propiedad, id=propiedad_id)
-    return render(request, "partials/contact_form.html", {"propiedad": propiedad})
+
+    if request.method == "POST":
+        form = ContactForm(request.POST, user=request.user)
+        if form.is_valid():
+            contacto = form.save(commit=False)
+            contacto.propiedad = propiedad
+            contacto.user = request.user
+            contacto.save()
+
+            # enviar correo al dueño
+            #send_mail(
+            #    subject=f"New message about your property {propiedad.nombre}",
+            #    message=f"""
+            #    You received a new contact request.
+
+            #    From: {contacto.nombre} ({contacto.email})
+            #    Property: {propiedad.nombre}
+            #    Message:
+            #    {contacto.mensaje}
+            #    """,
+            #    from_email="noreply@inmofinder.com",
+            #    recipient_list=[propiedad.owner.email],  # 👈 asegúrate que tu modelo tenga `owner`
+            #    fail_silently=False,
+            #)
+            
+
+            return JsonResponse({"success": True, "message": "✅ Your message has been sent!"})
+    else:
+        form = ContactForm(user=request.user)
+
+    return render(request, "partials/contact_form.html", {"form": form, "propiedad": propiedad})

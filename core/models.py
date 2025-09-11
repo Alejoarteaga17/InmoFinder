@@ -63,3 +63,14 @@ class MediaPropiedad(models.Model):
     def __str__(self):
         t = 'Video' if self.es_video else 'Imagen'
         return f"{t} de {self.propiedad.nombre}"
+
+class ContactMessage(models.Model):
+    propiedad = models.ForeignKey(Propiedad, related_name='contact_messages', on_delete=models.CASCADE)
+    user = models.ForeignKey('auth.User', related_name='contact_messages', on_delete=models.CASCADE, null=True, blank=True)
+    nombre = models.CharField(max_length=100)
+    email = models.EmailField()
+    mensaje = models.TextField()
+    fecha_envio = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Mensaje de {self.nombre} sobre {self.propiedad.nombre}"
