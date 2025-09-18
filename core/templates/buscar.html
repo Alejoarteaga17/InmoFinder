@@ -4,23 +4,24 @@
 {% block content %}
 <section class="container py-4">
 
-<h1 class="mb-4 text-center">Buscar Propiedades</h1>
+  <h1 class="mb-4 text-center">Search Properties</h1>
 
-<!-- Buscador -->
-<div class="d-flex justify-content-center mb-4">
-    {% include "partials/buscador.html" %}
-</div>
+  <!-- Buscador -->
+  <div class="d-flex justify-content-center mb-4">
+      {% include "partials/buscador.html" %}
+  </div>
 
-<h2 class="mb-4 text-center">Resultados</h2>
+  <h2 class="mb-4 text-center">Results</h2>
 
-<div class="row">
-  {% for propiedad in propiedades %}
-    {% include "partials/property_card.html" %}
-  {% empty %}
-    <p class="text-center">No se encontraron propiedades.</p>
-    <a class="text-center" href="{% url 'home' %}">Volver al inicio</a>
-  {% endfor %}
-</div>
+  <div class="row">
+    {% for propiedad in propiedades %}
+      {% include "partials/property_card.html" %}
+    {% empty %}
+      <p class="text-center">We couldn´t find any properties</p>
+      <a class="text-center" href="{% url 'home' %}">Back to home</a>
+    {% endfor %}
+  </div>
 
 </section>
+<script src="{% static 'js/filtros.js' %}"></script>
 {% endblock %}

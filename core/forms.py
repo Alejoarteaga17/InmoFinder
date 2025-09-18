@@ -7,7 +7,7 @@ from .models import ContactMessage
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(
         required=True,
-        widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "Correo electrónico"})
+        widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "Email"})
     )
 
     class Meta:
@@ -16,23 +16,23 @@ class RegisterForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["username"].widget.attrs.update({"class": "form-control", "placeholder": "Nombre de usuario"})
-        self.fields["password1"].widget.attrs.update({"class": "form-control", "placeholder": "Contraseña"})
-        self.fields["password2"].widget.attrs.update({"class": "form-control", "placeholder": "Repite la contraseña"})
-        self.fields["email"].widget.attrs.update({"class": "form-control", "placeholder": "Correo electrónico"})
+        self.fields["username"].widget.attrs.update({"class": "form-control", "placeholder": "Username"})
+        self.fields["password1"].widget.attrs.update({"class": "form-control", "placeholder": "Password"})
+        self.fields["password2"].widget.attrs.update({"class": "form-control", "placeholder": "Repeat Password"})
+        self.fields["email"].widget.attrs.update({"class": "form-control", "placeholder": "Email"})
 
     def clean_email(self):
         email = self.cleaned_data.get("email")
         if User.objects.filter(email=email).exists():
-            raise forms.ValidationError("Este correo ya está registrado.")
+            raise forms.ValidationError("This email is already registered.")
         return email
 
 
 class LoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["username"].widget.attrs.update({"class": "form-control", "placeholder": "Usuario"})
-        self.fields["password"].widget.attrs.update({"class": "form-control", "placeholder": "Contraseña"})
+        self.fields["username"].widget.attrs.update({"class": "form-control", "placeholder": "Username"})
+        self.fields["password"].widget.attrs.update({"class": "form-control", "placeholder": "Password"})
 
 class ContactForm(forms.ModelForm):
     class Meta:
@@ -51,6 +51,6 @@ class ContactForm(forms.ModelForm):
             self.fields['nombre'].widget.attrs['readonly'] = True
             self.fields['email'].widget.attrs['readonly'] = True
 
-            self.fields['nombre'].widget.attrs.update({"class": "form-control", "placeholder": "Tu nombre"})
-            self.fields['email'].widget.attrs.update({"class": "form-control", "placeholder": "Tu correo electrónico"})
-            self.fields['mensaje'].widget.attrs.update({"class": "form-control", "placeholder": "Tu mensaje", "rows": 4})
+            self.fields['nombre'].widget.attrs.update({"class": "form-control", "placeholder": "Your name"})
+            self.fields['email'].widget.attrs.update({"class": "form-control", "placeholder": "Your Email"})
+            self.fields['mensaje'].widget.attrs.update({"class": "form-control", "placeholder": "Write your message here", "rows": 4})
