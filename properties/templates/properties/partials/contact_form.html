@@ -1,0 +1,64 @@
+<div class="modal-header">
+    <h5 class="modal-title">Contact Owner</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+    <form method="post" id="contactForm" action="{% url 'contact_owner' propiedad.id %}">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="mb-2">
+        {{ form.nombre.label_tag }}
+        {{ form.nombre }}
+        {{ form.nombre.errors }}
+    </div>
+    <div class="mb-2">
+        {{ form.email.label_tag }}
+        {{ form.email }}
+        {{ form.email.errors }}
+    </div>
+    <div class="mb-2">
+        {{ form.mensaje.label_tag }}
+        {{ form.mensaje }}
+        {{ form.mensaje.errors }}
+    </div>
+    <div class="d-flex justify-content-end">
+        <button class="btn btn-dark mt-2" type="submit">Enviar mensaje</button>
+    </div>
+    </form>
+    <!-- Mensaje de éxito dinámico -->
+    <div id="formMessage" class="alert d-none mt-3"></div>
+</div>
+
+<script>
+    document.getElementById('contactForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    })
+    .then(response => response.json())
+    .then(data => {
+        const msg = document.getElementById('formMessage');
+        msg.classList.remove('d-none');
+
+        if(data.success){
+            msg.classList.add('alert-success');
+            msg.innerHTML = data.message;
+
+            setTimeout(() => {
+                window.location.href = "{% url 'home' %}";
+            }, 2000);
+        } else {
+            msg.classList.add('alert-danger');
+            msg.innerHTML = "❌ Corrige los errores: " + JSON.stringify(data.errors);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+    });
+
+</script>
+

@@ -58,6 +58,11 @@
             <li><b>Garaje:</b> {% if propiedad.garaje %}Sí{% else %}No{% endif %}</li>
             <li><b>Mascotas:</b> {% if propiedad.mascotas %}Permitidas{% else %}No permitidas{% endif %}</li>
             <li><b>Disponibilidad:</b> {{ propiedad.fecha_disponibilidad }}</li>
+            <li><b>Tipo de propiedad:</b> {{ propiedad.get_tipo_propiedad_display }}</li>
+            <li><b>Estrato:</b> {{ propiedad.estrato }}</li>
+            <li><b>Año de construcción:</b> {{ propiedad.construccion_ano }}</li>
+            <li><b>Piso:</b> {{ propiedad.piso }}</li>
+            <li><b>Ascensor:</b> {% if propiedad.ascensor %}Sí{% else %}No{% endif %}</li>
         </ul>
 
         <h6>Descripción</h6>

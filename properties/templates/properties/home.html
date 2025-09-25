@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "properties/base.html" %}
 {% load static %}
 
 {% block title %}Home · InmoFinder{% endblock %}
@@ -45,7 +45,7 @@
     <div class="col-lg-6 text-center mt-5 mt-lg-0">
       <img src="{% static 'images/default.jpg' %}" alt="Casa moderna" class="img-fluid shadow hero-img">
     </div>
-    {% include "partials/buscador.html" %}
+    {% include "properties/partials/buscador.html" %}
   </div>
 
   <!-- Carrusel de propiedades -->
@@ -66,7 +66,7 @@
     <div class="row justify-content-center">
   {% endif %}
 
-      {% include "partials/property_card.html" %}
+      {% include "properties/partials/property_card.html" %}
 
   {% if forloop.counter|divisibleby:4 or forloop.last %}
     </div>

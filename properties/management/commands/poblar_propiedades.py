@@ -2,7 +2,9 @@ import random
 from datetime import date, timedelta
 from decimal import Decimal
 from django.core.management.base import BaseCommand
-from core.models import Propiedad, MediaPropiedad
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from properties.models import Propiedad, MediaPropiedad
 
 # Datos base
 tipos = ["Piso", "Casa", "Chalet", "Ático", "Dúplex", "Estudio", "Loft"]
@@ -17,16 +19,10 @@ zonas_comunes_opciones = [
     "Jacuzzi"
 ]
 imagenes_demo = [
-    "propiedades/demo1.jpg",
-    "propiedades/demo2.jpg",
-    "propiedades/demo3.jpg",
-    "propiedades/demo4.jpg",
-    "propiedades/demo5.jpg"
+    "properties/default.jpg",
 ]
 videos_demo = [
-    "propiedades/tour1.mp4",
-    "propiedades/tour2.mp4",
-    "propiedades/tour3.mp4"
+    "properties/muestra.mp4",
 ]
 barrios = [
     "El Poblado", "Laureles", "Envigado", "Bello",
@@ -43,23 +39,43 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         n = options["n"]
+        User = get_user_model()
 
+        # 👤 Crear o recuperar usuario propietario demo
+        demo_email = "alejandro_10_123@hotmail.com"
+        demo_user, created = User.objects.get_or_create(
+            email=demo_email,
+            defaults={
+                "username": "alejandro_demo",
+                "is_propietario": True,
+                "is_comprador": False,
+            }
+        )
+        if created:
+            demo_user.set_password("123456")  # ⚠️ password por defecto, puedes cambiarlo
+            demo_user.save()
+            self.stdout.write(self.style.SUCCESS(f"👤 Usuario demo creado: {demo_email} (propietario)"))
+        else:
+            self.stdout.write(f"➡️ Usando usuario existente: {demo_email}")
+
+        # 🏡 Crear propiedades
         for _ in range(n):
             nombre = f"{random.choice(tipos)} en {random.choice(barrios)}"
             area = Decimal(random.randint(35, 250))
             precio_m2 = Decimal(random.randint(250000, 6000000))
             precio_total = precio_m2 * area
             habitaciones = random.randint(1, 6)
-            bannos = random.randint(1, 4)  # 👈 corregido con doble "n"
+            banos = random.randint(1, 4)
             parqueaderos = random.randint(0, 3)
 
             propiedad = Propiedad.objects.create(
+                owner=demo_user,  # 👈 asignamos el propietario demo
                 nombre=nombre,
                 descripcion=f"Propiedad en {nombre}, ideal para familias o inversión.",
                 precio_total=precio_total,
                 precio_m2=precio_m2,
                 habitaciones=habitaciones,
-                bannos=bannos,
+                banos=banos,
                 parqueaderos=parqueaderos,
                 area=area,
                 ubicacion="Medellín, Colombia",
@@ -86,4 +102,6 @@ class Command(BaseCommand):
                     tipo="video"
                 )
 
-        self.stdout.write(self.style.SUCCESS(f"✅ Se generaron {n} propiedades de ejemplo en Medellín."))
+        self.stdout.write(self.style.SUCCESS(
+            f"✅ Se generaron {n} propiedades de ejemplo en Medellín para {demo_email}."
+        ))

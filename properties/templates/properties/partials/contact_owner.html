@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+    <body>
+    <p>Hola {{ propiedad.owner.get_full_name|default:propiedad.owner.username }},</p>
+    <p>Has recibido un nuevo mensaje sobre tu propiedad <strong>{{ propiedad.nombre }}</strong> ({{ propiedad.ubicacion }}):</p>
+    <hr>
+    <p><b>De:</b> {{ sender_name }} &lt;{{ sender_email }}&gt;</p>
+    <p><b>Mensaje:</b></p>
+    <p>{{ message|linebreaksbr }}</p>
+    <hr>
+    <p>Puedes ver la propiedad aquí: <a href="https://{{ site }}{% url 'detalle_propiedad' propiedad.id %}">Ver propiedad</a></p>
+    <p>Saludos,</p>
+    <p>InmoFinder</p>
+    </body>
+</html>
