@@ -4,3 +4,7 @@ __pycache__/
 db.sqlite3
 media/
 .idea/
+/.env
+/*.env
+/openAI.env
+/open_ai_api_keys.env

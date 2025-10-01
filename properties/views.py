@@ -115,7 +115,7 @@ def contact_owner(request, propiedad_id):
                 "errors": form.errors
             })
         messages.error(request, "Por favor corrige los errores en el formulario.")
-        return redirect("detalle_propiedad", {"propiedad": propiedad})
+        return redirect("detalle_propiedad", propiedad_id=propiedad_id)
 
     # Guardar mensaje
     cm = form.save(commit=False)
@@ -146,8 +146,9 @@ def contact_owner(request, propiedad_id):
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         return JsonResponse({
             "success": True,
-            "message": "✅ Tu mensaje ha sido enviado al propietario."
+            "message": "Tu mensaje ha sido enviado al propietario."
         })
 
-    messages.success(request, "✅ Tu mensaje ha sido enviado al propietario.")
-    return redirect("detalle_propiedad", {"propiedad": propiedad})
+    messages.success(request, "Tu mensaje ha sido enviado al propietario.")
+    return redirect("home")
+   # return redirect("detalle_propiedad", propiedad_id=propiedad_id)
