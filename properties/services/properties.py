@@ -29,7 +29,7 @@ location, seller, images url, listing url, etc.).
 If some data is missing, use null.
 """
 
-TARGET_RESULTS = 50  # número objetivo de propiedades
+TARGET_RESULTS = 100  # número objetivo de propiedades
 
 def extract_listings():
     results = []
@@ -39,7 +39,7 @@ def extract_listings():
             logging.info("Meta alcanzada, no se necesitan más URLs.")
             break
 
-        logging.info(f"🔎 Intentando extraer desde: {url}")
+        logging.info(f"Intentando extraer desde: {url}")
 
         USER_MSG = f"""
         Browse the following url {url}, extract up to {TARGET_RESULTS - len(results)} 
@@ -48,7 +48,7 @@ def extract_listings():
         """
 
         try:
-            logging.info("📡 Enviando request a OpenAI...")
+            logging.info("Enviando request a OpenAI...")
             response = client.responses.create(
                 model="gpt-5",
                 tools=[{"type": "web_search"}],
@@ -57,14 +57,14 @@ def extract_listings():
                     {"role": "user", "content": USER_MSG}
                 ]
             )
-            logging.info("✅ Respuesta recibida, intentando parsear JSON...")
+            logging.info("Respuesta recibida, intentando parsear JSON...")
 
             data = response.output_text
 
             try:
                 listings = json.loads(data)
             except Exception as e:
-                logging.error(f"❌ No se pudo parsear JSON de {url}: {e}")
+                logging.error(f"No se pudo parsear JSON de {url}: {e}")
                 continue
 
             if isinstance(listings, dict):  # a veces responde dict en vez de lista
