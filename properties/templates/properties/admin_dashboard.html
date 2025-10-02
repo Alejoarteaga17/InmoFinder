@@ -1,0 +1,36 @@
+{% extends "properties/base.html" %}
+{% block content %}
+<div class="container mt-4">
+<h2>Admin Dashboard</h2>
+<a href="{% url 'properties:create' %}" class="btn btn-primary mb-3">Create New Property</a>
+
+<table class="table table-striped">
+<thead>
+    <tr>
+    <th>Owner</th>
+    <th>Name</th>
+    <th>Location</th>
+    <th>Price</th>
+    <th>Actions</th>
+    </tr>
+</thead>
+<tbody>
+    {% for propiedad in propiedades %}
+    <tr>
+        <td>{{ propiedad.owner.get_full_name }} ({{ propiedad.owner.email }})</td>
+        <td>{{ propiedad.nombre }}</td>
+        <td>{{ propiedad.ubicacion }}</td>
+        <td>${{ propiedad.precio_total }}</td>
+        <td>
+        <a href="{% url 'properties:edit' propiedad.id %}" class="btn btn-sm btn-warning">Edit</a>
+        <a href="{% url 'properties:delete' propiedad.id %}" class="btn btn-sm btn-danger">Delete</a>
+        {% if propiedad.multimedia_set.all %}
+            <a href="{% url 'properties:media_list' propiedad.id %}" class="btn btn-sm btn-info">View Media</a>
+        {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

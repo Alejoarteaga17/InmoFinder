@@ -130,7 +130,7 @@ AUTH_USER_MODEL = "users.Usuario"  # Nuestro modelo de usuario personalizado
 EMAIL_BACKEND = "django.users.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = 'alejoarte123@gmail.com'
 '''
-EMAIL_BACKEND = "django.users.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = "django.Usuarios.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.example.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

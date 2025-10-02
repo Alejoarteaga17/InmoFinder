@@ -1,0 +1,22 @@
+{% extends "properties/base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>{% if form.instance.pk %}Edit Property{% else %}New Property{% endif %}</h2>
+  
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    {% if form.can_enable_multimedia %}
+        <div class="form-group mt-3">
+            <label for="id_multimedia_files">Media Files</label>
+            {{ form.multimedia_files }}
+            <small class="form-text text-muted">{{ form.multimedia_files.help_text }}</small>
+        </div>
+    {% endif %}
+
+    <button type="submit" class="btn btn-success">Save</button>
+    <a href="{% url 'properties:dashboard' %}" class="btn btn-secondary">Cancel</a>
+</form>
+</div>
+{% endblock %}

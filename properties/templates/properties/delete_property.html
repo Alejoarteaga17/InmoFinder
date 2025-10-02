@@ -1,0 +1,19 @@
+{% extends "properties/base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Delete Property</h2>
+    <p>
+    ¿Are you sure you want to delete the property <strong>{{ object.nombre }}</strong> located at {{ object.ubicacion }}?
+    {% if object.multimedia_set.all %}
+        <br>
+        <small class="text-danger">⚠️ This property has associated media files that will also be deleted.</small>
+    {% endif %}
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a href="{% url 'properties:dashboard' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
