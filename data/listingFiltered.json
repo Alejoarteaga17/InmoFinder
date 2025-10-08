@@ -125,8 +125,8 @@
       "codigo_fincaraiz": "192767407"
     },
     "listing_url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-linde-medellin/192767407",
-    "pets_allowed": null,
-    "furnished": null,
+    "pets_allowed": false,
+    "furnished": false,
     "media_urls": [
       "https://cdn4.fincaraiz.com.co/repo/img/th.outside800x600.68a4ceaf7e90c_infocdn__dqrh1ljk7j02vweisbu7pkwi6r2vtgrwxksbxry6jpg.jpg",
       "https://cdn2.infocasas.com.uy/repo/img/68a4ceaf7e90c_infocdn__dqrh1ljk7j02vweisbu7pkwi6r2vtgrwxksbxry6jpg.jpg",
@@ -173,7 +173,7 @@
       "codigo_fincaraiz": "192839964"
     },
     "listing_url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-castropol-medellin/192839964",
-    "pets_allowed": null,
+    "pets_allowed": false,
     "furnished": null,
     "media_urls": [
       "https://cdn4.fincaraiz.com.co/repo/img/th.outside800x600.68d471563d781_infocdn__gr-apartamento-en-venta-castropol-1757116713-2732-9394jpeg.jpeg",
@@ -200,7 +200,7 @@
     "seller": "Tu360Inmobiliario en colaboración con Pulppo",
     "admin_fee_cop": 1600000,
     "parking_spaces": 2,
-    "estrato": null,
+    "estrato": 5,
     "floor": null,
     "area_privada_m2": 288.0,
     "property_type": "Casa",
@@ -224,7 +224,7 @@
       "codigo_fincaraiz": "192880387"
     },
     "listing_url": "https://www.fincaraiz.com.co/casa-en-venta-en-el-poblado-medellin/192880387",
-    "pets_allowed": null,
+    "pets_allowed": true,
     "furnished": true,
     "media_urls": [
       "https://cdn4.fincaraiz.com.co/repo/img/th.outside800x600.68c9bbfc2a77c_infocdn__picture-a323fe091333436784507450b0ba8abajpg.jpg",
@@ -271,7 +271,7 @@
       "codigo_fincaraiz": "192874944"
     },
     "listing_url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-urbanizacion-las-cumbres-medellin/192874944",
-    "pets_allowed": null,
+    "pets_allowed": true,
     "furnished": null,
     "media_urls": [
       "https://cdn4.fincaraiz.com.co/repo/img/th.outside800x600.68c8796c3ae57_infocdn__t0lgvdjk38huridyggmefavit6unc3gllyvdmtncjpg.jpg",
@@ -298,8 +298,8 @@
     "seller": "Tu360Inmobiliario en colaboración con Pulppo",
     "admin_fee_cop": 850000,
     "parking_spaces": 2,
-    "estrato": null,
-    "floor": null,
+    "estrato": 6,
+    "floor": 2,
     "area_privada_m2": 225.0,
     "property_type": "Apartamento",
     "condition": "Requiere mantenimiento (remodelado 1989)",
@@ -319,8 +319,8 @@
       "codigo_fincaraiz": "192884360"
     },
     "listing_url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-poblado-medellin/192884360",
-    "pets_allowed": null,
-    "furnished": null,
+    "pets_allowed": false,
+    "furnished": false,
     "media_urls": [
       "https://cdn4.fincaraiz.com.co/repo/img/th.outside800x600.68e5921657e78_infocdn__picture-411d68053dcd4010bc1d96cf855477a7jpg.jpg",
       "https://cdn2.infocasas.com.uy/repo/img/68e5921657e78_infocdn__picture-411d68053dcd4010bc1d96cf855477a7jpg.jpg",
@@ -366,8 +366,8 @@
       "codigo_fincaraiz": "192940497"
     },
     "listing_url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-almeria-medellin/192940497",
-    "pets_allowed": null,
-    "furnished": null,
+    "pets_allowed": false,
+    "furnished": false,
     "media_urls": [
       "https://cdn4.fincaraiz.com.co/repo/img/th.outside800x600.68de9bfc06705_infocdn__gr420025320250322102623jpg.jpg",
       "https://cdn2.infocasas.com.uy/repo/img/68de9bfcc9384_infocdn__gr420028220250322103000jpg.jpg",
@@ -916,16 +916,16 @@
   },
   {
     "title": "Apartamento en Venta en Laureles, Medellín",
-    "price_cop": null,
-    "area_m2": null,
+    "price_cop": 750000000,
+    "area_m2": 104.0,
     "rooms": 3,
     "bathrooms": 2,
     "location": "Laureles, Medellín, Antioquia",
     "seller": null,
-    "admin_fee_cop": 220,
+    "admin_fee_cop": 566600,
     "parking_spaces": null,
-    "estrato": null,
-    "floor": null,
+    "estrato": 5,
+    "floor": 2,
     "area_privada_m2": 127.0,
     "property_type": "Apartamento",
     "condition": null,
@@ -1140,15 +1140,15 @@
   },
   {
     "title": "Apartamento en Venta en Medellín",
-    "price_cop": null,
-    "area_m2": null,
-    "rooms": null,
-    "bathrooms": null,
+    "price_cop": 1300000000,
+    "area_m2": 132,
+    "rooms": 3,
+    "bathrooms": 4,
     "location": "Medellín, Antioquia",
     "seller": null,
-    "admin_fee_cop": null,
-    "parking_spaces": null,
-    "estrato": null,
+    "admin_fee_cop": 1000000,
+    "parking_spaces": 2,
+    "estrato": 6,
     "floor": null,
     "area_privada_m2": null,
     "property_type": "Apartamento",
@@ -1244,32 +1244,6 @@
       "https://cdn2.infocasas.com.uy/repo/img/688cc6cbaedc3_infocdn__fxdea5ylo6wx1mgsj3flaep6cs0nv7qsj8u12ovfjpg.jpg",
       "https://cdn2.infocasas.com.uy/repo/img/688cc6cc367aa_infocdn__dajwy4rawyexpv4mthg8p276gd1o1wut1kn5hyitjpg.jpg",
       "https://cdn2.infocasas.com.uy/repo/img/688cc6ccd694a_infocdn__vuryw2cvolfz8mbinffrorebt6sobggeu6f5qwcajpg.jpg"
-    ]
-  },
-  {
-    "title": "Apartamento en Venta en El Poblado, Medellín",
-    "price_cop": null,
-    "area_m2": null,
-    "rooms": null,
-    "bathrooms": null,
-    "location": "El Poblado, Medellín, Antioquia",
-    "seller": null,
-    "admin_fee_cop": null,
-    "parking_spaces": null,
-    "estrato": null,
-    "floor": null,
-    "area_privada_m2": null,
-    "property_type": "Apartamento",
-    "condition": null,
-    "description": null,
-    "amenities": [],
-    "property details": null,
-    "listing_url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-poblado-medellin/192109219",
-    "pets_allowed": null,
-    "furnished": null,
-    "media_urls": [
-      "https://cdn1.infocasas.com.uy/web/686d1269a662c_popup_agosto25_desk.png",
-      "https://cdn1.infocasas.com.uy/web/686d1269a169f_popup_agosto25_mobile.png"
     ]
   },
   {
