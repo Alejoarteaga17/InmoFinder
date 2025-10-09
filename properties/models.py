@@ -1,4 +1,3 @@
-# propiedades/models.py
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -8,7 +7,7 @@ User = get_user_model()
 
 class Propiedad(models.Model):
     # Relación con el propietario (owner)
-    owner = models.ForeignKey(User, related_name='propiedades', on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, related_name='propiedades', on_delete=models.CASCADE, null=True, blank=True)
 
     # Información general
     title = models.CharField(max_length=255, null=True, blank=True)
