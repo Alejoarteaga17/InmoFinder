@@ -2,50 +2,53 @@ from django import forms
 from django.core.exceptions import ValidationError
 from .models import ContactMessage, Propiedad
 
+
 class ContactForm(forms.ModelForm):
     class Meta:
         model = ContactMessage
-        fields = ["name", "email", "message"]
+        # ContactMessage uses spanish field names in the model
+        fields = ["nombre", "email", "telefono", "mensaje"]
         widgets = {
-            "message": forms.Textarea(attrs={"class": "form-control", "placeholder": "Your Message", "rows": 4}),
+            "mensaje": forms.Textarea(attrs={"class": "form-control", "placeholder": "Your Message", "rows": 4}),
         }
+
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
+        # set bootstrap classes & placeholders
+        self.fields['nombre'].widget.attrs.update({"class": "form-control", "placeholder": "Your name"})
+        self.fields['email'].widget.attrs.update({"class": "form-control", "placeholder": "Your Email"})
+        self.fields['mensaje'].widget.attrs.update({"class": "form-control", "placeholder": "Write your message here", "rows": 4})
+
         if user and user.is_authenticated:
-            self.fields['name'].initial = user.get_full_name() or user.username
+            self.fields['nombre'].initial = user.get_full_name() or user.username
             self.fields['email'].initial = user.email
-            self.fields['name'].widget.attrs['readonly'] = True
+            # make name and email readonly for authenticated users
+            self.fields['nombre'].widget.attrs['readonly'] = True
             self.fields['email'].widget.attrs['readonly'] = True
 
-            self.fields['name'].widget.attrs.update({"class": "form-control", "placeholder": "Your name"})
-            self.fields['email'].widget.attrs.update({"class": "form-control", "placeholder": "Your Email"})
-            self.fields['message'].widget.attrs.update({"class": "form-control", "placeholder": "Write your message here", "rows": 4})
 
 class PropiedadForm(forms.ModelForm):
     # campo opcional para subir múltiples archivos desde el mismo form
     multimedia_files = forms.FileField(
         required=False,
-        widget=forms.ClearableFileInput(attrs={"multiple": True}),
         help_text="Upload files. They are processed only if the property data is valid."
     )
 
     class Meta:
         model = Propiedad
+        # Use the new model field names
         fields = [
-            "nombre", "descripcion", "precio_total", "precio_m2",
-            "habitaciones", "banos", "parqueaderos", "area",
-            "ubicacion", "tipo", "zonas_comunes", "fecha_disponibilidad",
-            "garaje", "mascotas", "estrato"
+            "title", "description", "price_cop", "admin_fee_cop",
+            "area_m2", "area_privada_m2", "rooms", "bathrooms", "parking_spaces",
+            "location", "property_type", "estrato", "floor",
+            "pets_allowed", "furnished", "amenities"
         ]
-        widgets = {
-            "fecha_disponibilidad": forms.DateInput(attrs={"type": "date"}),
-        }
 
     def clean(self):
         cleaned = super().clean()
-        required = ["nombre", "descripcion", "precio_total", "area", "ubicacion"]
+        required = ["title", "description", "price_cop", "area_m2", "location"]
         errors = {}
 
         for field in required:
@@ -53,22 +56,26 @@ class PropiedadForm(forms.ModelForm):
             if value in (None, ""):
                 errors[field] = ValidationError("This field is required.")
 
-        # basic numeric validations
-        precio_total = cleaned.get("precio_total")
-        area = cleaned.get("area")
-        precio_m2 = (precio_total / area) if (precio_total is not None and area not in (None, 0)) else None
+        # basic numeric validations (use new names)
+        price = cleaned.get("price_cop")
+        area = cleaned.get("area_m2")
+        precio_m2 = None
+        try:
+            if price is not None and area not in (None, 0):
+                precio_m2 = float(price) / float(area)
+        except Exception:
+            precio_m2 = None
 
-        if precio_total is not None and precio_total <= 0:
-            errors["precio_total"] = ValidationError("The total price must be greater than 0.")
+        if price is not None and price <= 0:
+            errors["price_cop"] = ValidationError("The total price must be greater than 0.")
         if precio_m2 is not None and precio_m2 <= 0:
-            errors["precio_m2"] = ValidationError("The price per m² must be greater than 0.")
+            errors["area_m2"] = ValidationError("The price per m² must be greater than 0.")
         if area is not None and area <= 0:
-            errors["area"] = ValidationError("The area must be greater than 0.")
+            errors["area_m2"] = ValidationError("The area must be greater than 0.")
 
         if errors:
             raise ValidationError(errors)
-
-        # If we reached here, the property has all the necessary data
+        # mark the form as ready for multimedia processing
         self.enable_multimedia = True
         return cleaned
 

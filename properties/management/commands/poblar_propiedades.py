@@ -69,28 +69,26 @@ class Command(BaseCommand):
             parqueaderos = random.randint(0, 3)
 
             propiedad = Propiedad.objects.create(
-                owner=demo_user,  # 👈 asignamos el propietario demo
-                nombre=nombre,
-                descripcion=f"Propiedad en {nombre}, ideal para familias o inversión.",
-                precio_total=precio_total,
-                precio_m2=precio_m2,
-                habitaciones=habitaciones,
-                banos=banos,
-                parqueaderos=parqueaderos,
-                area=area,
-                ubicacion="Medellín, Colombia",
-                tipo=random.choice(tipos),
-                zonas_comunes=", ".join(random.sample(zonas_comunes_opciones, k=random.randint(1, 3))),
-                fecha_disponibilidad=date.today() + timedelta(days=random.randint(10, 180)),
-                garaje=bool(random.getrandbits(1)),
-                mascotas=bool(random.getrandbits(1))
+                owner=demo_user,
+                title=nombre,
+                description=f"Propiedad en {nombre}, ideal para familias o inversión.",
+                price_cop=int(precio_total),
+                area_m2=area,
+                rooms=habitaciones,
+                bathrooms=banos,
+                parking_spaces=parqueaderos,
+                location="Medellín, Colombia",
+                property_type=random.choice(tipos),
+                amenities=random.sample(zonas_comunes_opciones, k=random.randint(1, 3)),
+                pets_allowed=bool(random.getrandbits(1))
             )
 
             # Añadir imágenes
             for _ in range(random.randint(1, 3)):
                 MediaPropiedad.objects.create(
                     propiedad=propiedad,
-                    archivo=random.choice(imagenes_demo),
+                    # for demo we use url field pointing to static demo image
+                    url=random.choice(imagenes_demo),
                     tipo="imagen"
                 )
 
@@ -98,7 +96,7 @@ class Command(BaseCommand):
             if random.choice([True, False]):
                 MediaPropiedad.objects.create(
                     propiedad=propiedad,
-                    archivo=random.choice(videos_demo),
+                    url=random.choice(videos_demo),
                     tipo="video"
                 )
 

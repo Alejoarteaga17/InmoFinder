@@ -1,4 +1,7 @@
 {% extends "properties/base.html" %}
+{% load static %}
+{% load humanize %}
+{% block title %}Admin Dashboard{% endblock %}
 {% block content %}
 <div class="container mt-4">
 <h2>Admin Dashboard</h2>
@@ -18,13 +21,13 @@
     {% for propiedad in propiedades %}
     <tr>
         <td>{{ propiedad.owner.get_full_name }} ({{ propiedad.owner.email }})</td>
-        <td>{{ propiedad.nombre }}</td>
-        <td>{{ propiedad.ubicacion }}</td>
-        <td>${{ propiedad.precio_total }}</td>
+        <td>{{ propiedad.title }}</td>
+        <td>{{ propiedad.location }}</td>
+        <td>${{ propiedad.price_cop| intcomma }}</td>
         <td>
         <a href="{% url 'properties:edit' propiedad.id %}" class="btn btn-sm btn-warning">Edit</a>
         <a href="{% url 'properties:delete' propiedad.id %}" class="btn btn-sm btn-danger">Delete</a>
-        {% if propiedad.multimedia_set.all %}
+        {% if propiedad.media.exists %}
             <a href="{% url 'properties:media_list' propiedad.id %}" class="btn btn-sm btn-info">View Media</a>
         {% endif %}
         </td>

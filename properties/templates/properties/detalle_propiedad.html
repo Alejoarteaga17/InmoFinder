@@ -1,7 +1,7 @@
 {% load static %}
-
+{% load humanize %}
 <div class="modal-header">
-    <h5 class="modal-title">{{ propiedad.nombre }}</h5>
+    <h5 class="modal-title">{{ propiedad.title }}</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
 </div>
 
@@ -9,9 +9,9 @@
 
     <!-- Galería tipo slider -->
     <div class="galeria mb-3">
-        {% if propiedad.mediapropiedad_set.exists %}
+        {% if propiedad.media.exists %}
         <div class="slider">
-            {% for media in propiedad.mediapropiedad_set.all %}
+            {% for media in propiedad.media.all %}
                 {% if media.tipo == "imagen" %}
                     <div class="slide">
                         {% if media.archivo %}
@@ -41,37 +41,31 @@
 
     <!-- Información de la propiedad -->
     <div class="info-propiedad">
-        <p class="fw-bold text-success">Precio Total: $ {{ propiedad.precio_total|floatformat:0 }} COP</p>
+        <p class="fw-bold text-success">Precio Total: $ {{ propiedad.price_cop|intcomma }} COP</p>
         <p>
             <span class="price-m2-badge">
-                ${{ propiedad.precio_m2|floatformat:0 }} COP/m²
+                ${{ propiedad.price_m2|intcomma }} COP/m²
             </span>
         </p>
 
-        <p class="text-muted">📍 {{ propiedad.ubicacion }}</p>
+        <p class="text-muted">📍 {{ propiedad.location }}</p>
 
         <ul class="list-unstyled small">
-            <li><b>Área:</b> {{ propiedad.area }} m²</li>
-            <li><b>Habitaciones:</b> {{ propiedad.habitaciones }}</li>
-            <li><b>Baños:</b> {{ propiedad.banos }}</li>
-            <li><b>Parqueaderos:</b> {{ propiedad.parqueaderos }}</li>
-            <li><b>Garaje:</b> {% if propiedad.garaje %}Sí{% else %}No{% endif %}</li>
-            <li><b>Mascotas:</b> {% if propiedad.mascotas %}Permitidas{% else %}No permitidas{% endif %}</li>
-            <li><b>Disponibilidad:</b> {{ propiedad.fecha_disponibilidad }}</li>
-            <li><b>Tipo de propiedad:</b> {{ propiedad.get_tipo_propiedad_display }}</li>
-            <li><b>Estrato:</b> {{ propiedad.estrato }}</li>
-            <li><b>Año de construcción:</b> {{ propiedad.construccion_ano }}</li>
-            <li><b>Piso:</b> {{ propiedad.piso }}</li>
-            <li><b>Ascensor:</b> {% if propiedad.ascensor %}Sí{% else %}No{% endif %}</li>
+            <li><b>Área:</b> {{ propiedad.area_m2 }} m²</li>
+            <li><b>Rooms:</b> {{ propiedad.rooms }}</li>
+            <li><b>Bathrooms:</b> {{ propiedad.bathrooms }}</li>
+            <li><b>Parking Spaces:</b> {{ propiedad.parking_spaces }}</li>
+            <li><b>Garage:</b> {% if propiedad.parking_spaces > 0 %}Sí{% else %}No{% endif %}</li>
+            <li><b>Pets:</b> {% if propiedad.pets_allowed %}Permitidas{% else %}No permitidas{% endif %}</li>
+            <li><b>Build:</b> {{ propiedad.created_at }}</li>
+            <li><b>Property Type:</b> {{ propiedad.get_property_type_display }}</li>
+            <li><b>Stratum:</b> {{ propiedad.estrato }}</li>
+            <li><b>Floor:</b> {{ propiedad.floor }}</li>
+        <li><b>Amenities:</b> {% if propiedad.amenities %}{{ propiedad.amenities|join:", " }}{% else %}No amenities available{% endif %}</li>
         </ul>
 
-        <h6>Descripción</h6>
+        <h6>Description</h6>
         <p>{{ propiedad.descripcion }}</p>
-
-        {% if propiedad.zonas_comunes %}
-        <h6>Zonas comunes</h6>
-        <p>{{ propiedad.zonas_comunes }}</p>
-        {% endif %}
     </div>
 
 <div class="interes mt-4 text-center">
