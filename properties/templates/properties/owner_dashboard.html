@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container mt-4">
 <h2>My Properties</h2>
-<a href="{% url 'properties:create' %}" class="btn btn-primary mb-3">Add Property</a>
+<a href="{% url 'create' %}" class="btn btn-primary mb-3">Add Property</a>
 
 {% if propiedades %}
 <table class="table table-striped">
@@ -21,10 +21,10 @@
         <td>{{ propiedad.location }}</td>
         <td>${{ propiedad.price_cop }}</td>
         <td>
-            <a href="{% url 'properties:edit' propiedad.id %}" class="btn btn-sm btn-warning">Edit</a>
-            <a href="{% url 'properties:delete' propiedad.id %}" class="btn btn-sm btn-danger">Delete</a>
+            <a href="{% url 'edit' propiedad.id %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'delete' propiedad.id %}" class="btn btn-sm btn-danger">Delete</a>
             {% if propiedad.media.all %}
-                <a href="{% url 'properties:media_list' propiedad.id %}" class="btn btn-sm btn-info">View Media</a>
+                <a href="{% url 'media_list' propiedad.id %}" class="btn btn-sm btn-info">View Media</a>
             {% endif %}
 
         </td>

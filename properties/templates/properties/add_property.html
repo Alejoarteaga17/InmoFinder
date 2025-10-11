@@ -1,22 +1,130 @@
 {% extends "properties/base.html" %}
 {% block content %}
 <div class="container mt-4">
-  <h2>{% if form.instance.pk %}Edit Property{% else %}New Property{% endif %}</h2>
-  
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
+  <h2 class="mb-4">
+    {% if form.instance.pk %}Edit Property{% else %}Add New Property{% endif %}
+  </h2>
 
-    {% if form.can_enable_multimedia %}
-        <div class="form-group mt-3">
-            <label for="id_multimedia_files">Media Files</label>
-            {{ form.multimedia_files }}
-            <small class="form-text text-muted">{{ form.multimedia_files.help_text }}</small>
+  <form method="post" enctype="multipart/form-data" class="needs-validation">
+    {% csrf_token %}
+
+    <!-- Información básica -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">Basic Information</div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            {{ form.title.label_tag }}
+            {{ form.title }}
+          </div>
+          <div class="col-md-6 mb-3">
+            {{ form.location.label_tag }}
+            {{ form.location }}
+          </div>
         </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            {{ form.price_cop.label_tag }}
+            {{ form.price_cop }}
+          </div>
+          <div class="col-md-4 mb-3">
+            {{ form.admin_fee_cop.label_tag }}
+            {{ form.admin_fee_cop }}
+          </div>
+          <div class="col-md-4 mb-3">
+            {{ form.property_type.label_tag }}
+            {{ form.property_type }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detalles físicos -->
+    <div class="card mb-4">
+      <div class="card-header bg-secondary text-white">Property Details</div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            {{ form.area_m2.label_tag }}
+            {{ form.area_m2 }}
+          </div>
+          <div class="col-md-4 mb-3">
+            {{ form.area_privada_m2.label_tag }}
+            {{ form.area_privada_m2 }}
+          </div>
+          <div class="col-md-4 mb-3">
+            {{ form.parking_spaces.label_tag }}
+            {{ form.parking_spaces }}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            {{ form.rooms.label_tag }}
+            {{ form.rooms }}
+          </div>
+          <div class="col-md-4 mb-3">
+            {{ form.bathrooms.label_tag }}
+            {{ form.bathrooms }}
+          </div>
+          <div class="col-md-4 mb-3">
+            {{ form.floor.label_tag }}
+            {{ form.floor }}
+          </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ form.estrato.label_tag }}
+                {{ form.estrato }}
+            </div>
+            <div class="col-md-3 mb-3">
+                {{ form.pets_allowed.label_tag }}
+                {{ form.pets_allowed }}
+            </div>
+            <div class="col-md-3 mb-3">
+                {{ form.furnished.label_tag }}
+                {{ form.furnished }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Descripción y Amenidades -->
+    <div class="card mb-4">
+      <div class="card-header bg-info text-white">Description & Amenities</div>
+      <div class="card-body">
+        <div class="mb-3">
+          {{ form.description.label_tag }}
+          {{ form.description }}
+        </div>
+        <div class="mb-3">
+          {{ form.amenities.label_tag }}
+          {{ form.amenities }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Multimedia -->
+    {% if form.can_enable_multimedia %}
+    <div class="card mb-4">
+      <div class="card-header bg-dark text-white">Multimedia</div>
+      <div class="card-body">
+        <div class="form-group">
+          <label for="id_multimedia_files">Upload Images / Videos</label>
+          {{ form.multimedia_files }}
+          <small class="form-text text-muted">{{ form.multimedia_files.help_text }}</small>
+        </div>
+      </div>
+    </div>
     {% endif %}
 
-    <button type="submit" class="btn btn-success">Save</button>
-    <a href="{% url 'properties:dashboard' %}" class="btn btn-secondary">Cancel</a>
-</form>
+    <!-- Botones -->
+    <div class="d-flex justify-content-end">
+      <button type="submit" class="btn btn-success me-2">Save</button>
+      <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+
+  </form>
 </div>
 {% endblock %}

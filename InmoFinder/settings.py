@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'core',
     'properties',
     'users',
-    
 ]
 
 MIDDLEWARE = [
@@ -78,15 +77,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-
     }
 }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
-
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {'min_length': 9}},
@@ -107,6 +101,7 @@ USE_I18N = True
 USE_TZ = True
 
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
@@ -124,10 +119,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = "login"                # Si alguien intenta entrar a una vista protegida, lo manda al login
-LOGIN_REDIRECT_URL = "home"        # Después de iniciar sesión, lo manda al home
+LOGIN_REDIRECT_URL = "/properties/role-redirect/"        # Después de iniciar sesión, lo manda al home
 LOGOUT_REDIRECT_URL = "home"       # Después de hacer logout, lo manda al home
 AUTH_USER_MODEL = "users.Usuario"  # Nuestro modelo de usuario personalizado
-
 EMAIL_BACKEND = "django.users.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = 'alejoarte123@gmail.com'
 '''

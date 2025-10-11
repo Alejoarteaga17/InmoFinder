@@ -57,7 +57,6 @@
             <li><b>Parking Spaces:</b> {{ propiedad.parking_spaces }}</li>
             <li><b>Garage:</b> {% if propiedad.parking_spaces > 0 %}Sí{% else %}No{% endif %}</li>
             <li><b>Pets:</b> {% if propiedad.pets_allowed %}Permitidas{% else %}No permitidas{% endif %}</li>
-            <li><b>Build:</b> {{ propiedad.created_at }}</li>
             <li><b>Property Type:</b> {{ propiedad.get_property_type_display }}</li>
             <li><b>Stratum:</b> {{ propiedad.estrato }}</li>
             <li><b>Floor:</b> {{ propiedad.floor }}</li>
@@ -65,7 +64,7 @@
         </ul>
 
         <h6>Description</h6>
-        <p>{{ propiedad.descripcion }}</p>
+        <p>{{ propiedad. }}</p>
     </div>
 
 <div class="interes mt-4 text-center">
