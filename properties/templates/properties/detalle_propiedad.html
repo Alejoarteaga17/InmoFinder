@@ -16,6 +16,8 @@
                     <div class="slide">
                         {% if media.archivo %}
                             <img src="{{ media.archivo.url }}" class="img-fluid rounded" alt="{{ propiedad.nombre }}">
+                        {% elif media.url %}
+                            <img src="{{ media.url }}" class="img-fluid rounded" alt="{{ propiedad.nombre }}">
                         {% else %}
                             <img src="{% static 'images/default.jpg' %}" class="img-fluid rounded" alt="Sin imagen disponible">
                         {% endif %}
