@@ -16,8 +16,19 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 def home(request):
     # show latest properties (use created_at as fallback)
     qs = Propiedad.objects.all().order_by('-created_at')[:12]
-    media_prefetch = Prefetch('media', queryset=MediaPropiedad.objects.exclude(archivo__isnull=True).exclude(archivo=""))
+    media_prefetch = Prefetch('media', queryset=MediaPropiedad.objects.all())
     qs = qs.prefetch_related(media_prefetch)
+    # Agregar atributo portada a cada propiedad
+    for propiedad in qs:
+        portada = None
+        for media in propiedad.media.all():
+            if media.archivo:
+                portada = media.archivo.url
+                break
+            elif media.url:
+                portada = media.url
+                break
+        propiedad.portada = portada
     return render(request, "properties/home.html", {"propiedades": qs})
 
 @login_required
@@ -274,12 +285,23 @@ def buscar_propiedades(request):
         propiedades = propiedades.order_by(mapping[orden])
 
     # Prefetch media + paginación
-    media_prefetch = Prefetch('media', queryset=MediaPropiedad.objects.exclude(archivo__isnull=True).exclude(archivo="").order_by('id'))
+    media_prefetch = Prefetch('media', queryset=MediaPropiedad.objects.all())
     propiedades = propiedades.prefetch_related(media_prefetch)
 
     paginator = Paginator(propiedades, 12)
     page = request.GET.get("page")
     page_obj = paginator.get_page(page)
+    
+    # Agregar atributo portada a cada propiedad en la página
+    for propiedad in page_obj:
+        portada = None
+        for media in propiedad.media.all():
+            if media.archivo:
+                portada = media.archivo.url
+                break
+            elif media.url:
+                portada = media.url
+                break
+        propiedad.portada = portada
 
     return render(request, "properties/buscar.html", {"propiedades": page_obj})
-
