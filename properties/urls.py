@@ -17,4 +17,5 @@ urlpatterns = [
     path("contact/<int:propiedad_id>/", views.contact_owner, name="contact"),
     path("contact-form/<int:propiedad_id>/", views.contact_form, name="contact_form"),
     path("role-redirect/", views.role_redirect, name="role_redirect"),
+    path('toggle-favorite/', views.toggle_favorite, name='toggle_favorite'),
 ]

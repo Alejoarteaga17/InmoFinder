@@ -1,5 +1,6 @@
 {% load static %}
 {% load humanize %}
+
 <div class="modal-header">
     <h5 class="modal-title">{{ propiedad.title }}</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -76,9 +77,7 @@
     Contact
 </button>
     {% else %}
-        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-dark mt-2">
-            Contact
-        </a>
+        <a href="{% url 'login' %}?next={% url 'detalle_propiedad' propiedad.id %}?modal=1">Contact owner</a>
         <p class="small text-muted mt-2">You need an account to contact the owner.</p>
     {% endif %}
 </div>

@@ -12,6 +12,7 @@ from django.views.decorators.http import require_POST
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from .models import Favorite, Propiedad
 
 def home(request):
     # show latest properties (use created_at as fallback)
@@ -283,3 +284,14 @@ def buscar_propiedades(request):
 
     return render(request, "properties/buscar.html", {"propiedades": page_obj})
 
+@login_required
+def toggle_favorite(request):
+    propiedad_id = request.POST.get("propiedad_id")
+    propiedad = Propiedad.objects.get(id=propiedad_id)
+    favorite, created = Favorite.objects.get_or_create(user=request.user, propiedad=propiedad)
+
+    if not created:
+        favorite.delete()
+        return JsonResponse({"favorited": False})
+    else:
+        return JsonResponse({"favorited": True})
