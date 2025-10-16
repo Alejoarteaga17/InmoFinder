@@ -236,15 +236,15 @@ def buscar_propiedades(request):
     if precio_max:
         propiedades = propiedades.filter(price_cop__lte=precio_max)
 
-    habitaciones = request.GET.get("habitaciones")
+    habitaciones = request.GET.get("rooms")
     if habitaciones:
         propiedades = propiedades.filter(rooms=habitaciones)
 
-    banos = request.GET.get("banos")
+    banos = request.GET.get("bathrooms")
     if banos:
         propiedades = propiedades.filter(bathrooms=banos)
 
-    parqueaderos = request.GET.get("parqueaderos")
+    parqueaderos = request.GET.get("parking_spaces")
     if parqueaderos:
         propiedades = propiedades.filter(parking_spaces=parqueaderos)
 
