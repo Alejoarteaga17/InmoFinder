@@ -130,21 +130,32 @@ class PropiedadCreateView(LoginRequiredMixin, PropietarioRequiredMixin, RoleSucc
     def form_valid(self, form):
         # asignar propietario
         form.instance.owner = self.request.user
-        response = super().form_valid(form)
+        
+        try:
+            response = super().form_valid(form)
 
-        # procesar multimedia si el formulario lo permite
-        can_attach = getattr(form, "can_enable_multimedia", lambda: False)()
-        if can_attach:
-            files = self.request.FILES.getlist("multimedia_files")
-            obj = form.instance
-            for f in files:
-                try:
-                    MediaPropiedad.objects.create(propiedad=obj, archivo=f)
-                except Exception:
-                    pass
+            # procesar multimedia si el formulario lo permite
+            can_attach = getattr(form, "can_enable_multimedia", lambda: False)()
+            if can_attach:
+                files = self.request.FILES.getlist("multimedia_files")
+                obj = form.instance
+                for f in files:
+                    try:
+                        MediaPropiedad.objects.create(propiedad=obj, archivo=f)
+                    except Exception as e:
+                        # Log error but don't fail the whole operation
+                        print(f"Error creating media: {e}")
 
-        messages.success(self.request, "Propiedad creada correctamente")
-        return response
+            messages.success(self.request, "Propiedad creada correctamente")
+            return response
+        except Exception as e:
+            messages.error(self.request, f"Error al crear la propiedad: {str(e)}")
+            return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        # Mostrar mensaje de error cuando el formulario no es válido
+        messages.error(self.request, "Por favor, corrige los errores en el formulario.")
+        return super().form_invalid(form)
 
 # --- EDITAR PROPIEDAD ---
 class PropiedadUpdateView(LoginRequiredMixin, PropietarioRequiredMixin, RoleSuccessUrlMixin, UpdateView):

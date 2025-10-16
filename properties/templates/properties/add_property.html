@@ -5,6 +5,14 @@
     {% if form.instance.pk %}Edit Property{% else %}Add New Property{% endif %}
   </h2>
 
+  <!-- Mostrar errores generales del formulario -->
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ form.non_field_errors }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endif %}
+
   <form method="post" enctype="multipart/form-data" class="needs-validation">
     {% csrf_token %}
 
@@ -16,10 +24,16 @@
           <div class="col-md-6 mb-3">
             {{ form.title.label_tag }}
             {{ form.title }}
+            {% if form.title.errors %}
+              <div class="text-danger small">{{ form.title.errors }}</div>
+            {% endif %}
           </div>
           <div class="col-md-6 mb-3">
             {{ form.location.label_tag }}
             {{ form.location }}
+            {% if form.location.errors %}
+              <div class="text-danger small">{{ form.location.errors }}</div>
+            {% endif %}
           </div>
         </div>
 
@@ -27,14 +41,23 @@
           <div class="col-md-4 mb-3">
             {{ form.price_cop.label_tag }}
             {{ form.price_cop }}
+            {% if form.price_cop.errors %}
+              <div class="text-danger small">{{ form.price_cop.errors }}</div>
+            {% endif %}
           </div>
           <div class="col-md-4 mb-3">
             {{ form.admin_fee_cop.label_tag }}
             {{ form.admin_fee_cop }}
+            {% if form.admin_fee_cop.errors %}
+              <div class="text-danger small">{{ form.admin_fee_cop.errors }}</div>
+            {% endif %}
           </div>
           <div class="col-md-4 mb-3">
             {{ form.property_type.label_tag }}
             {{ form.property_type }}
+            {% if form.property_type.errors %}
+              <div class="text-danger small">{{ form.property_type.errors }}</div>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -48,14 +71,23 @@
           <div class="col-md-4 mb-3">
             {{ form.area_m2.label_tag }}
             {{ form.area_m2 }}
+            {% if form.area_m2.errors %}
+              <div class="text-danger small">{{ form.area_m2.errors }}</div>
+            {% endif %}
           </div>
           <div class="col-md-4 mb-3">
             {{ form.area_privada_m2.label_tag }}
             {{ form.area_privada_m2 }}
+            {% if form.area_privada_m2.errors %}
+              <div class="text-danger small">{{ form.area_privada_m2.errors }}</div>
+            {% endif %}
           </div>
           <div class="col-md-4 mb-3">
             {{ form.parking_spaces.label_tag }}
             {{ form.parking_spaces }}
+            {% if form.parking_spaces.errors %}
+              <div class="text-danger small">{{ form.parking_spaces.errors }}</div>
+            {% endif %}
           </div>
         </div>
 
@@ -63,14 +95,23 @@
           <div class="col-md-4 mb-3">
             {{ form.rooms.label_tag }}
             {{ form.rooms }}
+            {% if form.rooms.errors %}
+              <div class="text-danger small">{{ form.rooms.errors }}</div>
+            {% endif %}
           </div>
           <div class="col-md-4 mb-3">
             {{ form.bathrooms.label_tag }}
             {{ form.bathrooms }}
+            {% if form.bathrooms.errors %}
+              <div class="text-danger small">{{ form.bathrooms.errors }}</div>
+            {% endif %}
           </div>
           <div class="col-md-4 mb-3">
             {{ form.floor.label_tag }}
             {{ form.floor }}
+            {% if form.floor.errors %}
+              <div class="text-danger small">{{ form.floor.errors }}</div>
+            {% endif %}
           </div>
         </div>
 
@@ -78,14 +119,23 @@
             <div class="col-md-6 mb-3">
                 {{ form.estrato.label_tag }}
                 {{ form.estrato }}
+                {% if form.estrato.errors %}
+                  <div class="text-danger small">{{ form.estrato.errors }}</div>
+                {% endif %}
             </div>
             <div class="col-md-3 mb-3">
                 {{ form.pets_allowed.label_tag }}
                 {{ form.pets_allowed }}
+                {% if form.pets_allowed.errors %}
+                  <div class="text-danger small">{{ form.pets_allowed.errors }}</div>
+                {% endif %}
             </div>
             <div class="col-md-3 mb-3">
                 {{ form.furnished.label_tag }}
                 {{ form.furnished }}
+                {% if form.furnished.errors %}
+                  <div class="text-danger small">{{ form.furnished.errors }}</div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -97,27 +147,31 @@
         <div class="mb-3">
           {{ form.description.label_tag }}
           {{ form.description }}
+          {% if form.description.errors %}
+            <div class="text-danger small">{{ form.description.errors }}</div>
+          {% endif %}
         </div>
         <div class="mb-3">
           {{ form.amenities.label_tag }}
           {{ form.amenities }}
+          {% if form.amenities.errors %}
+            <div class="text-danger small">{{ form.amenities.errors }}</div>
+          {% endif %}
         </div>
       </div>
     </div>
 
     <!-- Multimedia -->
-    {% if form.can_enable_multimedia %}
     <div class="card mb-4">
       <div class="card-header bg-dark text-white">Multimedia</div>
       <div class="card-body">
         <div class="form-group">
           <label for="id_multimedia_files">Upload Images / Videos</label>
-          {{ form.multimedia_files }}
+          <input type="file" name="multimedia_files" class="form-control" id="id_multimedia_files" multiple>
           <small class="form-text text-muted">{{ form.multimedia_files.help_text }}</small>
         </div>
       </div>
     </div>
-    {% endif %}
 
     <!-- Botones -->
     <div class="d-flex justify-content-end">

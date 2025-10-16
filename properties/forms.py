@@ -30,10 +30,12 @@ class ContactForm(forms.ModelForm):
 
 
 class PropiedadForm(forms.ModelForm):
-    # campo opcional para subir múltiples archivos desde el mismo form
+    # Este campo NO es parte del modelo, solo para subir archivos
+    # El atributo 'multiple' lo agregamos en el template
     multimedia_files = forms.FileField(
         required=False,
-        help_text="Upload files. They are processed only if the property data is valid."
+        help_text="Selecciona uno o más archivos para subir.",
+        widget=forms.FileInput(attrs={'class': 'form-control'})
     )
 
     class Meta:
@@ -45,38 +47,50 @@ class PropiedadForm(forms.ModelForm):
             "location", "property_type", "estrato", "floor",
             "pets_allowed", "furnished", "amenities"
         ]
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'price_cop': forms.NumberInput(attrs={'class': 'form-control'}),
+            'admin_fee_cop': forms.NumberInput(attrs={'class': 'form-control'}),
+            'area_m2': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'area_privada_m2': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'rooms': forms.NumberInput(attrs={'class': 'form-control'}),
+            'bathrooms': forms.NumberInput(attrs={'class': 'form-control'}),
+            'parking_spaces': forms.NumberInput(attrs={'class': 'form-control'}),
+            'location': forms.TextInput(attrs={'class': 'form-control'}),
+            'property_type': forms.Select(attrs={'class': 'form-control'}),
+            'estrato': forms.NumberInput(attrs={'class': 'form-control'}),
+            'floor': forms.NumberInput(attrs={'class': 'form-control'}),
+            'pets_allowed': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'furnished': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'amenities': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter amenities as JSON, e.g., ["Pool", "Gym"]'}),
+        }
 
     def clean(self):
         cleaned = super().clean()
-        required = ["title", "description", "price_cop", "area_m2", "location"]
-        errors = {}
-
-        for field in required:
-            value = cleaned.get(field)
-            if value in (None, ""):
-                errors[field] = ValidationError("This field is required.")
-
-        # basic numeric validations (use new names)
+        
+        # Validar campos numéricos específicos
         price = cleaned.get("price_cop")
         area = cleaned.get("area_m2")
-        precio_m2 = None
-        try:
-            if price is not None and area not in (None, 0):
-                precio_m2 = float(price) / float(area)
-        except Exception:
-            precio_m2 = None
 
+        # Validar que el precio sea positivo
         if price is not None and price <= 0:
-            errors["price_cop"] = ValidationError("The total price must be greater than 0.")
-        if precio_m2 is not None and precio_m2 <= 0:
-            errors["area_m2"] = ValidationError("The price per m² must be greater than 0.")
-        if area is not None and area <= 0:
-            errors["area_m2"] = ValidationError("The area must be greater than 0.")
+            self.add_error("price_cop", "El precio total debe ser mayor que 0.")
 
-        if errors:
-            raise ValidationError(errors)
-        # mark the form as ready for multimedia processing
-        self.enable_multimedia = True
+        # Validar que el área sea positiva
+        if area is not None and area <= 0:
+            self.add_error("area_m2", "El área debe ser mayor que 0.")
+
+        # Validar precio por m² solo si ambos valores existen
+        if price and area and area > 0:
+            precio_m2 = float(price) / float(area)
+            if precio_m2 <= 0:
+                self.add_error("area_m2", "El precio por m² debe ser mayor que 0.")
+
+        # Solo habilitar multimedia si no hay errores
+        if not self.errors:
+            self.enable_multimedia = True
+        
         return cleaned
 
     def can_enable_multimedia(self) -> bool:
