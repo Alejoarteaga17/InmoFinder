@@ -10,6 +10,12 @@
             <p class="text-center text-muted">Create your account</p>
             <form method="post">
               {% csrf_token %}
+              {# Mostrar errores generales del formulario (no asociados a un campo) #}
+              {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                  {{ form.non_field_errors }}
+                </div>
+              {% endif %}
               <div class="mb-3">
               {{ form.username }}
               <div class="text-danger small">{{ form.username.errors }}</div>

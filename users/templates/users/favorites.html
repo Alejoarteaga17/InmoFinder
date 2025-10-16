@@ -3,10 +3,10 @@
 <div class="container my-4">
   <h2>My Favorites</h2>
   <div class="row">
-    {% for fav in favorites %}
-      {% include 'properties/partials/property_card.html' with propiedad=fav.propiedad %}
+    {% for propiedad in propiedades %}
+      {% include 'properties/partials/property_card.html' %}
     {% empty %}
-      <p>You dont't have any favorite properties yet ❤️</p>
+      <p>You don't have any favorite properties yet ❤️</p>
     {% endfor %}
   </div>
 </div>

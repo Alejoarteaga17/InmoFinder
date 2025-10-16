@@ -13,12 +13,12 @@ class LoginView(AuthLoginView):
     template_name = "users/login.html"
     authentication_form = LoginForm
 
-def get_success_url(self):
-        # Si hay un parámetro next, respétalo (incluyendo ?modal=1)
+    def get_success_url(self):
+        # Si hay un parámetro next, respétalo solo si NO contiene '?modal=1'
         next_url = self.request.GET.get("next") or self.request.POST.get("next")
-        if next_url:
+        if next_url and "?modal=1" not in next_url:
             return next_url
-        return super().get_success_url()
+        return "/"  # Redirige al home si el next contiene ?modal=1 o no existe
 
 def logout_view(request):
     logout(request)
@@ -29,8 +29,21 @@ class RegisterView(FormView):
     form_class = RegisterForm
 
     def form_valid(self, form):
+        # Crear usuario
         user = form.save()
-        login(self.request, user)
+        # Autenticar y hacer login con las credenciales recién creadas
+        from django.contrib.auth import authenticate
+        email = form.cleaned_data.get("email")
+        password = form.cleaned_data.get("password1")
+        user_auth = authenticate(self.request, username=email, password=password)
+        if user_auth is not None:
+            login(self.request, user_auth)
+        else:
+            # Fallback en caso de que el backend no acepte authenticate con email directamente
+            try:
+                login(self.request, user, backend="django.contrib.auth.backends.ModelBackend")
+            except Exception:
+                pass
         return redirect("home")
 
 REASONS = {
@@ -45,9 +58,12 @@ def error_403(request, exception=None):
     raw = None
     if exception and getattr(exception, "args", None):
         raw = exception.args[0]  # el mensaje que lanzamos en PermissionDenied("CODIGO")
-    reason_human = REASONS.get(raw, REASONS["DEFAULT"])
+
+    # Asegura que la clave sea string y evita problemas de tipado
+    key = raw or "DEFAULT"
+    reason_human = REASONS.get(key, REASONS["DEFAULT"])  
     ctx = {
-        "reason_code": raw or "DEFAULT",
+        "reason_code": key,
         "reason_human": reason_human,
         "path": request.path,
         "user": getattr(request, "user", None),
@@ -61,19 +77,31 @@ def profile(request):
 @login_required
 def favorites_list(request):
     from django.db.models import Prefetch
-    from properties.models import MediaPropiedad
+    from properties.models import MediaPropiedad, Propiedad
     
-    # Prefetch solo las medias con archivo válido
-    media_prefetch = Prefetch(
-        'propiedad__media',
-        queryset=MediaPropiedad.objects.exclude(archivo__isnull=True).exclude(archivo="")
+    # Obtener IDs de favoritos primero
+    favorite_ids = list(
+        Favorite.objects.filter(user=request.user).values_list('propiedad_id', flat=True)
     )
-    favorites = Favorite.objects.filter(user=request.user).select_related('propiedad').prefetch_related(media_prefetch)
     
-    # Obtener IDs de favoritos para marcarlos en las cards
-    favorite_ids = list(favorites.values_list('propiedad_id', flat=True))
+    # Obtener las propiedades favoritas con sus medias
+    propiedades = Propiedad.objects.filter(id__in=favorite_ids)
+    media_prefetch = Prefetch('media', queryset=MediaPropiedad.objects.all())
+    propiedades = propiedades.prefetch_related(media_prefetch)
+    
+    # Agregar atributo portada a cada propiedad (igual que en home)
+    for propiedad in propiedades:
+        portada = None
+        for media in propiedad.media.all():  # type: ignore
+            if media.archivo:
+                portada = media.archivo.url
+                break
+            elif media.url:
+                portada = media.url
+                break
+        propiedad.portada = portada  # type: ignore
     
     return render(request, 'users/favorites.html', {
-        'favorites': favorites,
+        'propiedades': propiedades,
         'favorite_ids': favorite_ids
 })

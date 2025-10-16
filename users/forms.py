@@ -3,10 +3,6 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import Usuario
 
 class RegisterForm(UserCreationForm):
-    ROLE_CHOICES = (
-        ("comprador", "Comprador"),
-        ("propietario", "Propietario"),
-    )
     email = forms.EmailField(
         required=True,
         widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "Email"})
@@ -15,15 +11,10 @@ class RegisterForm(UserCreationForm):
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Teléfono"})
     )
-    account_type = forms.ChoiceField(
-        choices=ROLE_CHOICES,
-        initial="comprador",
-        widget=forms.Select(attrs={"class": "form-select"})
-    )
 
     class Meta:
         model = Usuario   # 👉 Usamos tu modelo personalizado
-        fields = ["username", "email", "phone", "account_type", "password1", "password2"]
+        fields = ["username", "email", "phone", "password1", "password2"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -41,11 +32,9 @@ class RegisterForm(UserCreationForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.is_comprador = True   # 👤 todos empiezan como comprador
-
-        selected = self.cleaned_data.get("account_type", "comprador")
-        if selected == "propietario":
-            user.is_propietario = True
+        # 👤 Todos los nuevos usuarios son comprador por defecto
+        user.is_comprador = True
+        user.is_propietario = False
 
         if commit:
             user.save()

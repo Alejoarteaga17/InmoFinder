@@ -8,6 +8,46 @@ document.addEventListener("DOMContentLoaded", function () {
   window._propertyModalEl = document.getElementById("propertyModal");
   window._propertyDetailContent = document.getElementById("propertyDetailContent");
   window._contactModalContent = document.getElementById("contactModalContent");
+  
+  // Limpiar backdrop cuando se cierra el modal de propiedad
+  if (window._propertyModalEl) {
+    window._propertyModalEl.addEventListener('hidden.bs.modal', function () {
+      // Limpiar el contenido del modal
+      if (window._propertyDetailContent) {
+        window._propertyDetailContent.innerHTML = `
+          <div class="text-center p-5 w-100">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-3">Loading property...</p>
+          </div>`;
+      }
+      
+      // Asegurar que se eliminen todos los backdrops
+      const backdrops = document.querySelectorAll('.modal-backdrop');
+      backdrops.forEach(backdrop => backdrop.remove());
+      
+      // Restaurar scroll del body
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    });
+  }
+  
+  // Limpiar backdrop cuando se cierra el modal de contacto
+  const contactModalEl = document.getElementById("contactModal");
+  if (contactModalEl) {
+    contactModalEl.addEventListener('hidden.bs.modal', function () {
+      // Asegurar que se eliminen todos los backdrops
+      const backdrops = document.querySelectorAll('.modal-backdrop');
+      backdrops.forEach(backdrop => backdrop.remove());
+      
+      // Restaurar scroll del body si no hay otros modales abiertos
+      if (!document.querySelector('.modal.show')) {
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+      }
+    });
+  }
 });
 
 // Helper to get CSRF token
@@ -126,12 +166,34 @@ document.addEventListener("click", function (e) {
         </div>`;
     }
 
-    fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
-      .then((r) => r.text())
-      .then((html) => {
-        if (content) content.innerHTML = html;
-        const modal = document.getElementById("contactModal");
-        if (modal) new bootstrap.Modal(modal).show();
+    fetch(url, { 
+      headers: { "X-Requested-With": "XMLHttpRequest" },
+      credentials: "same-origin"
+    })
+      .then((r) => {
+        // Intentar parsear como JSON primero (en caso de error/redirect)
+        const contentType = r.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          return r.json().then(data => ({ type: 'json', data }));
+        }
+        return r.text().then(html => ({ type: 'html', data: html }));
+      })
+      .then((response) => {
+        if (response.type === 'json') {
+          // Respuesta JSON (error o redirección)
+          if (response.data.redirect) {
+            window.location.href = response.data.redirect;
+            return;
+          }
+          if (content) {
+            content.innerHTML = `<div class="alert alert-warning">${response.data.message || 'No se puede contactar al propietario.'}</div>`;
+          }
+        } else {
+          // Respuesta HTML (formulario)
+          if (content) content.innerHTML = response.data;
+          const modal = document.getElementById("contactModal");
+          if (modal) new bootstrap.Modal(modal).show();
+        }
       })
       .catch((err) => {
         console.error("Error loading contact form:", err);
@@ -161,31 +223,46 @@ document.addEventListener("submit", function (e) {
     .then((data) => {
       console.log("contact form response", data);
       if (data && data.success) {
-        const msgEl = document.getElementById("formMessage");
-        if (msgEl) {
-          msgEl.classList.remove("d-none");
-          msgEl.innerHTML = data.message;
+        // Cerrar el modal de contacto
+        const contactModalEl = document.getElementById("contactModal");
+        if (contactModalEl) {
+          const contactModalInstance = bootstrap.Modal.getInstance(contactModalEl);
+          if (contactModalInstance) {
+            contactModalInstance.hide();
+          }
         }
-        const propertyId =
-          document.getElementById("openContactBtn")?.dataset.propertyId ||
-          form.dataset.propertyId;
-        if (propertyId) {
-          fetch(`/property/${propertyId}/?modal=1`, {
-            headers: { "X-Requested-With": "XMLHttpRequest" },
-          })
-            .then((r) => r.text())
-            .then((html) => {
-              const modalDetail =
-                document.querySelector("#propertyModal #propertyDetailContent") ||
-                document.querySelector(".modal-content");
-              if (modalDetail) modalDetail.innerHTML = html;
-            });
-        } else {
-          window.location.reload();
+        
+        // Mostrar mensaje de éxito con alert o toast
+        // Opción 1: Alert Bootstrap en el modal de la propiedad
+        const propertyDetailContent = document.getElementById("propertyDetailContent");
+        if (propertyDetailContent) {
+          const successAlert = document.createElement('div');
+          successAlert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+          successAlert.style.zIndex = '9999';
+          successAlert.innerHTML = `
+            <strong>¡Mensaje enviado!</strong> ${data.message || 'El propietario recibirá tu mensaje pronto.'}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          `;
+          document.body.appendChild(successAlert);
+          
+          // Auto-cerrar después de 5 segundos
+          setTimeout(() => {
+            successAlert.remove();
+          }, 5000);
         }
       } else {
         console.warn("Contact form failed", data);
+        // Mostrar error en el formulario
+        const msgEl = document.getElementById("formMessage");
+        if (msgEl) {
+          msgEl.classList.remove("d-none", "alert-success");
+          msgEl.classList.add("alert-danger");
+          msgEl.innerHTML = data.message || 'Error al enviar el mensaje.';
+        }
       }
     })
-    .catch((err) => console.error("Error submitting contact form:", err));
+    .catch((err) => {
+      console.error("Error submitting contact form:", err);
+      alert('Error al enviar el mensaje. Por favor, intenta nuevamente.');
+    });
 });

@@ -24,31 +24,54 @@ def home(request):
     # Agregar atributo portada a cada propiedad
     for propiedad in qs:
         portada = None
-        for media in propiedad.media.all():
+        for media in propiedad.media.all(): # type: ignore
             if media.archivo:
                 portada = media.archivo.url
                 break
             elif media.url:
                 portada = media.url
                 break
-        propiedad.portada = portada
-    return render(request, "properties/home.html", {"propiedades": qs})
+        propiedad.portada = portada # type: ignore
+    
+    # Obtener IDs de favoritos si el usuario está autenticado
+    favorite_ids = []
+    if request.user.is_authenticated:
+        favorite_ids = list(Favorite.objects.filter(user=request.user).values_list('propiedad_id', flat=True))
+    
+    return render(request, "properties/home.html", {
+        "propiedades": qs,
+        "favorite_ids": favorite_ids
+    })
 
 @login_required
 def contact_form(request, propiedad_id):
     propiedad = get_object_or_404(Propiedad, id=propiedad_id)
+    
+    # Si la propiedad no tiene propietario, redirigir al home
+    if not propiedad.owner:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': False,
+                'redirect': '/',
+                'message': 'Esta propiedad no tiene propietario asignado.'
+            })
+        return redirect('home')
+    
     form = ContactForm(user=request.user)
     return render(request, "properties/partials/contact_form.html", {"form": form, "propiedad": propiedad})
 
 
 class PropietarioRequiredMixin(UserPassesTestMixin):
-    """Restringe acceso solo a propietarios"""
+    """Restringe acceso solo a propietarios y admins"""
     def test_func(self):
         request = getattr(self, "request", None)
         user = getattr(request, "user", None)
         # Si no hay request o user, denegar acceso
         if not user or not getattr(user, "is_authenticated", False):
             return False
+        # Permitir acceso a admins
+        if hasattr(user, "is_admin") and bool(user.is_admin):
+            return True
         # Caso 1: si tienes campo is_propietario en tu modelo personalizado
         if hasattr(user, "is_propietario"):
             return bool(user.is_propietario)
@@ -169,9 +192,7 @@ class PropiedadDeleteView(LoginRequiredMixin, PropietarioRequiredMixin, RoleSucc
 # --- DETALLE DE PROPIEDAD ---
 def detalle_propiedad(request, propiedad_id):
     propiedad = get_object_or_404(Propiedad, id=propiedad_id)
-    # If requested as modal, render the partial used by AJAX
-    if request.GET.get("modal") == "1":
-        return render(request, "properties/partials/propiedad_modal.html", {"propiedad": propiedad})
+    # Siempre renderiza el mismo template (que ya está diseñado como modal)
     return render(request, "properties/detalle_propiedad.html", {"propiedad": propiedad})
 
 # --- VISTA: REDIRECCIÓN POR ROL (después de login) ---
@@ -307,7 +328,15 @@ def buscar_propiedades(request):
                 break
         propiedad.portada = portada
 
-    return render(request, "properties/buscar.html", {"propiedades": page_obj})
+    # Obtener IDs de favoritos si el usuario está autenticado
+    favorite_ids = []
+    if request.user.is_authenticated:
+        favorite_ids = list(Favorite.objects.filter(user=request.user).values_list('propiedad_id', flat=True))
+
+    return render(request, "properties/buscar.html", {
+        "propiedades": page_obj,
+        "favorite_ids": favorite_ids
+    })
 
 @login_required
 def toggle_favorite(request, propiedad_id):

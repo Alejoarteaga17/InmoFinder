@@ -20,7 +20,13 @@ class Usuario(AbstractUser):
     REQUIRED_FIELDS = ['username']  # Campos requeridos además del USERNAME_FIELD
 
     def save(self, *args, **kwargs):
-        # Si el usuario es admin, también debe ser staff
+        # Si el usuario es admin, también debe ser staff y superuser
+        if self.is_admin:
+            self.is_staff = True
+            self.is_superuser = True
+        else:
+            self.is_superuser = False
+        # Mantener staff si es admin
         self.is_staff = bool(self.is_admin)
         super().save(*args, **kwargs)
 
