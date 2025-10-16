@@ -90,34 +90,21 @@ document.getElementById('contactForm').addEventListener('submit', function(e){
 });
 
 // --- Toggle Favoritos ---
-document.addEventListener("DOMContentLoaded", () => {
-  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-
-  document.querySelectorAll(".favorite-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      const propiedadId = btn.dataset.id;
-
-      fetch("/toggle-favorite/", {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": csrftoken,
-          "X-Requested-With": "XMLHttpRequest",
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: `propiedad_id=${propiedadId}`,
-      })
-      .then(res => res.json())
+document.addEventListener('click', function(e) {
+  if (e.target.closest('.favorite-btn')) {
+    const btn = e.target.closest('.favorite-btn');
+    const propId = btn.dataset.id;
+    fetch(`/toggle_favorite/${propId}/`)
+      .then(response => response.json())
       .then(data => {
-        const icon = btn.querySelector("i");
-        if (data.favorited) {
-          icon.classList.remove("bi-heart");
-          icon.classList.add("bi-heart-fill");
+        const icon = btn.querySelector('i');
+        if (data.status === 'added') {
+          icon.classList.remove('bi-heart');
+          icon.classList.add('bi-heart-fill', 'text-danger');
         } else {
-          icon.classList.remove("bi-heart-fill");
-          icon.classList.add("bi-heart");
+          icon.classList.remove('bi-heart-fill', 'text-danger');
+          icon.classList.add('bi-heart');
         }
       });
-    });
-  });
+  }
 });
