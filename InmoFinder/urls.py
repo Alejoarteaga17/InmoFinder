@@ -18,11 +18,14 @@ from django.contrib import admin
 from django.urls import path, include
 from users import views
 from properties import views
+from users.views import error_403
 
+handler403 = error_403
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('users/', include('users.urls')),
-    path('properties/', include('properties.urls')),  
+    path('properties/', include('properties.urls')),
+
 ]
