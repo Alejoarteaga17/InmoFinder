@@ -39,5 +39,20 @@ def profile(request):
 
 @login_required
 def favorites_list(request):
-    favorites = Favorite.objects.filter(user=request.user).select_related('propiedad')
-    return render(request, 'users/favorites.html', {'favorites': favorites})
+    from django.db.models import Prefetch
+    from properties.models import MediaPropiedad
+    
+    # Prefetch solo las medias con archivo válido
+    media_prefetch = Prefetch(
+        'propiedad__media',
+        queryset=MediaPropiedad.objects.exclude(archivo__isnull=True).exclude(archivo="")
+    )
+    favorites = Favorite.objects.filter(user=request.user).select_related('propiedad').prefetch_related(media_prefetch)
+    
+    # Obtener IDs de favoritos para marcarlos en las cards
+    favorite_ids = list(favorites.values_list('propiedad_id', flat=True))
+    
+    return render(request, 'users/favorites.html', {
+        'favorites': favorites,
+        'favorite_ids': favorite_ids
+})

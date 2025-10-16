@@ -1,3 +1,4 @@
+contact_form
 include {% load static %}
 <div class="modal-header">
     <h5 class="modal-title">Contact Owner</h5>
@@ -29,45 +30,3 @@ include {% load static %}
     <!-- Mensaje de éxito dinámico -->
     <div id="formMessage" class="alert d-none mt-3"></div>
 </div>
-
-
-<script>
-    form.addEventListener("submit", function(e) {
-        e.preventDefault();  // 🚨 detener el envío normal del form
-
-        const formData = new FormData(form);
-
-        fetch(form.action, {
-            method: "POST",
-            body: formData,
-            headers: {
-                "X-Requested-With": "XMLHttpRequest"
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            msg.classList.remove("d-none", "alert-success", "alert-danger");
-            if (data.success) {
-                msg.classList.add("alert-success");
-                msg.innerHTML = data.message;
-
-                setTimeout(() => {
-                    const modal = bootstrap.Modal.getInstance(document.getElementById("contactModal"));
-                    modal.hide();
-                    msg.classList.add("d-none");
-                    form.reset();
-                }, 2000);
-            } else {
-                msg.classList.add("alert-danger");
-                msg.innerHTML = "❌ Corrige los errores: " + JSON.stringify(data.errors);
-            }
-        })
-        .catch(error => {
-            msg.classList.remove("d-none");
-            msg.classList.add("alert-danger");
-            msg.innerHTML = "⚠️ Error al enviar el mensaje.";
-            console.error("Error:", error);
-        });
-    });
-</script>
-
