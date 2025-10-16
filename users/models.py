@@ -19,6 +19,11 @@ class Usuario(AbstractUser):
     USERNAME_FIELD = 'email'  # Usar email como campo de login
     REQUIRED_FIELDS = ['username']  # Campos requeridos además del USERNAME_FIELD
 
+    def save(self, *args, **kwargs):
+        # Si el usuario es admin, también debe ser staff
+        self.is_staff = bool(self.is_admin)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.username} ({'Admin' if self.is_admin else 'Propietario' if self.is_propietario else 'Comprador'})"
 
