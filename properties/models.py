@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.conf import settings
 
 
@@ -98,3 +99,14 @@ class ContactMessage(models.Model):
     def __str__(self):
         # ✅ corregido: 'propiedad.nombre' no existe, debe ser 'propiedad.title'
         return f"Mensaje de {self.nombre} sobre {self.propiedad.title}"
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorites')
+    propiedad = models.ForeignKey(Propiedad, on_delete=models.CASCADE, related_name='favoritos')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'propiedad')
+
+    def __str__(self):
+        return f"{self.user.username} ❤️ {self.propiedad.title}"

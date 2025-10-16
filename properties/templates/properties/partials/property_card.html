@@ -1,7 +1,26 @@
 {% load static %}
 {% load humanize %}
 <div class="col-md-3 mb-4">
-  <div class="card property-card shadow-sm h-100">
+  <div class="card property-card shadow-sm h-100 position-relative">
+
+    <!-- ❤ Botón de favorito -->
+    {% if user.is_authenticated %}
+      <button 
+        type="button" 
+        class="btn btn-link p-0 position-absolute top-0 end-0 m-2 toggle-favorite" 
+        data-property-id="{{ propiedad.id }}"
+        data-id="{{ propiedad.id }}"
+        data-toggle-url="{% url 'toggle_favorite' propiedad.id %}"
+        aria-label="Toggle Favorite">
+        {% if propiedad.id in favorite_ids %}
+          <i class="bi bi-heart-fill text-danger fs-4"></i>
+        {% else %}
+          <i class="bi bi-heart text-dark fs-4"></i>
+        {% endif %}
+      </button>
+    {% endif %}
+
+
     <a href="{% url 'detalle_propiedad' propiedad.id %}" 
         class="view-property" 
         data-bs-toggle="modal" 

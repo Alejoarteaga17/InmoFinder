@@ -211,6 +211,67 @@ header {
     border: 1px solid #ccc;
 }
 
+/* ===== Navbar & Hamburguesa ===== */
+.dropdown-menu-custom {
+  position: absolute;
+  top: 3rem;
+  right: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 0.5rem 0;
+  display: none;
+  flex-direction: column;
+  min-width: 180px;
+  z-index: 1000;
+}
+
+.dropdown-menu-custom.show {
+  display: flex;
+}
+
+.dropdown-menu-custom a {
+  text-decoration: none;
+  color: var(--ink);
+  padding: 0.6rem 1.2rem;
+  transition: background 0.2s ease;
+}
+
+.dropdown-menu-custom a:hover {
+  background: #f7f7f7;
+}
+
+/* Íconos */
+.bi-person-circle, .bi-list {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+.bi-person-circle:hover, .bi-list:hover {
+  opacity: 0.7;
+}
+
+/* --- Panel lateral personalizado (offcanvas) --- */
+.offcanvas {
+  background-color: #f9f9f9;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+.offcanvas-header {
+  border-bottom: 1px solid #ddd;
+}
+
+.offcanvas-body a {
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.offcanvas-body a:hover {
+  color: var(--ink);
+}
+
 
 
 

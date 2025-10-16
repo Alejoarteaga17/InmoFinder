@@ -1,0 +1,13 @@
+{% extends 'properties/base.html' %}
+{% block content %}
+<div class="container my-4">
+  <h2>My Favorites</h2>
+  <div class="row">
+    {% for fav in favorites %}
+      {% include 'properties/partials/property_card.html' with propiedad=fav.propiedad %}
+    {% empty %}
+      <p>You dont't have any favorite properties yet ❤️</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

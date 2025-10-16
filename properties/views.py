@@ -12,6 +12,9 @@ from django.views.decorators.http import require_POST
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import JsonResponse
+from .models import Favorite, Propiedad
+
 
 def home(request):
     # show latest properties (use created_at as fallback)
@@ -244,15 +247,15 @@ def buscar_propiedades(request):
     if precio_max:
         propiedades = propiedades.filter(price_cop__lte=precio_max)
 
-    habitaciones = request.GET.get("habitaciones")
+    habitaciones = request.GET.get("rooms")
     if habitaciones:
         propiedades = propiedades.filter(rooms=habitaciones)
 
-    banos = request.GET.get("banos")
+    banos = request.GET.get("bathrooms")
     if banos:
         propiedades = propiedades.filter(bathrooms=banos)
 
-    parqueaderos = request.GET.get("parqueaderos")
+    parqueaderos = request.GET.get("parking_spaces")
     if parqueaderos:
         propiedades = propiedades.filter(parking_spaces=parqueaderos)
 
@@ -305,3 +308,14 @@ def buscar_propiedades(request):
         propiedad.portada = portada
 
     return render(request, "properties/buscar.html", {"propiedades": page_obj})
+
+@login_required
+def toggle_favorite(request, propiedad_id):
+    propiedad = Propiedad.objects.get(id=propiedad_id)
+    favorite, created = Favorite.objects.get_or_create(user=request.user, propiedad=propiedad)
+
+    if not created:
+        favorite.delete()
+        return JsonResponse({'status': 'removed'})
+    else:
+        return JsonResponse({'status': 'added'})
