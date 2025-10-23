@@ -27,9 +27,7 @@
         <td>
         <a href="{% url 'edit' propiedad.id %}" class="btn btn-sm btn-warning">Edit</a>
         <a href="{% url 'delete' propiedad.id %}" class="btn btn-sm btn-danger">Delete</a>
-        {% if propiedad.media.exists %}
-            <a href="{% url 'media_list' propiedad.id %}" class="btn btn-sm btn-info">View Media</a>
-        {% endif %}
+        <a href="{% url 'media_list' propiedad.id %}" class="btn btn-sm btn-info">View Media</a>
         </td>
     </tr>
     {% endfor %}

@@ -10,8 +10,8 @@ class Command(BaseCommand):
             email="admin_test@example.com",
             defaults={"username": "admin_test"}
         )
-        user.is_admin = True  # setea is_staff vía save()
-        user.is_propietario = True   # si quieres probar coexistencia
+        user.is_admin = True
+        user.is_propietario = True
         user.is_comprador  = True
         user.set_password("Admin1234!")
         user.save()

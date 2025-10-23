@@ -1,9 +1,9 @@
 from django.urls import path
 from . import views
 
+
 urlpatterns = [
     path("", views.home, name="home"),
-    # nombre exacto que busca el código/templates
     path("buscar/", views.buscar_propiedades, name="buscar_propiedades"),
     path("buscar/", views.buscar_propiedades, name="buscar"),
     path("dashboard/", views.OwnerDashboardView.as_view(), name="dashboard"),
@@ -14,6 +14,7 @@ urlpatterns = [
     path("propiedad/<int:propiedad_id>/", views.detalle_propiedad, name="detalle_propiedad"),
     path("propiedad/<int:propiedad_id>/contact/", views.contact_owner, name="contact_owner"),
     path("media/<int:propiedad_id>/", views.media_list, name="media_list"),
+    path("media/<int:propiedad_id>/delete/<int:media_id>/", views.media_delete, name="media_delete"),
     path("contact/<int:propiedad_id>/", views.contact_owner, name="contact"),
     path("contact-form/<int:propiedad_id>/", views.contact_form, name="contact_form"),
     path("role-redirect/", views.role_redirect, name="role_redirect"),

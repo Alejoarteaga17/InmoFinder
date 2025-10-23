@@ -1,4 +1,5 @@
 {% extends "properties/base.html" %}
+{% load static %}
 {% block content %}
 <div class="container mt-4">
   <h2 class="mb-4">
@@ -75,19 +76,20 @@
         </div>
 
         <div class="row">
-            <div class="col-md-6 mb-3">
-                {{ form.estrato.label_tag }}
-                {{ form.estrato }}
-            </div>
-            <div class="col-md-3 mb-3">
-                {{ form.pets_allowed.label_tag }}
-                {{ form.pets_allowed }}
-            </div>
-            <div class="col-md-3 mb-3">
-                {{ form.furnished.label_tag }}
-                {{ form.furnished }}
-            </div>
+          <div class="col-md-6 mb-3">
+            {{ form.estrato.label_tag }}
+            {{ form.estrato }}
+          </div>
+          <div class="col-md-3 mb-3">
+            {{ form.pets_allowed.label_tag }}
+            {{ form.pets_allowed }}
+          </div>
+          <div class="col-md-3 mb-3">
+            {{ form.furnished.label_tag }}
+            {{ form.furnished }}
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- Descripción y Amenidades -->
@@ -105,26 +107,11 @@
       </div>
     </div>
 
-    <!-- Multimedia -->
-    {% if form.can_enable_multimedia %}
-    <div class="card mb-4">
-      <div class="card-header bg-dark text-white">Multimedia</div>
-      <div class="card-body">
-        <div class="form-group">
-          <label for="id_multimedia_files">Upload Images / Videos</label>
-          {{ form.multimedia_files }}
-          <small class="form-text text-muted">{{ form.multimedia_files.help_text }}</small>
-        </div>
-      </div>
-    </div>
-    {% endif %}
-
     <!-- Botones -->
     <div class="d-flex justify-content-end">
       <button type="submit" class="btn btn-success me-2">Save</button>
       <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
     </div>
-
   </form>
 </div>
 {% endblock %}

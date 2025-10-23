@@ -1,93 +1,198 @@
 {% load static %}
 {% load humanize %}
-<div class="modal-header">
-    <h5 class="modal-title">{{ propiedad.title }}</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-</div>
 
-<div class="modal-body detalle-propiedad">
+<head>
+  <meta charset="utf-8">
+  <title>{{ propiedad.title|default:"Property" }} — Details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Galería tipo slider -->
-    <div class="galeria mb-3">
-        {% if propiedad.media.exists %}
-        <div class="slider">
-            {% for media in propiedad.media.all %}
-                {% if media.tipo == "imagen" %}
-                    <div class="slide">
-                        {% if media.archivo %}
-                            <img src="{{ media.archivo.url }}" class="img-fluid rounded" alt="{{ propiedad.nombre }}">
-                        {% else %}
-                            <img src="{% static 'images/default.jpg' %}" class="img-fluid rounded" alt="Sin imagen disponible">
-                        {% endif %}
-                    </div>
-                {% elif media.tipo == "video" %}
-                    <div class="slide">
-                        <video controls class="w-100 rounded">
-                            {% if media.archivo %}
-                                <source src="{{ media.archivo.url }}" type="video/mp4">
-                            {% else %}
-                                <source src="{% static 'images/muestra.mp4' %}" type="video/mp4">
-                            {% endif %}
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
-                {% endif %}
-            {% endfor %}
-        </div>
-        {% else %}
-            <img src="{% static 'images/default.jpg' %}" class="img-fluid rounded w-100" alt="Sin imagen">
-        {% endif %}
-    </div>
+  {# Si tu proyecto ya incluye Bootstrap en base.html, puedes quitar estas líneas #}
+  {# <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> #}
 
-    <!-- Información de la propiedad -->
-    <div class="info-propiedad">
-        <p class="fw-bold text-success">Precio Total: $ {{ propiedad.price_cop|intcomma }} COP</p>
-        <p>
-            <span class="price-m2-badge">
-                ${{ propiedad.price_m2|intcomma }} COP/m²
-            </span>
-        </p>
+  <style>
+    .chip { display:inline-block; padding:.2rem .55rem; border:1px solid #e9e9e9; border-radius:999px; font-size:.85rem; color:#333; background:#fff; }
+    .carousel-item img, .carousel-item video { object-fit: cover; height: 420px; }
+    @media (max-width: 576px) { .carousel-item img, .carousel-item video { height: 260px; } }
+  </style>
+</head>
+<body>
+<div class="container py-4">
 
-        <p class="text-muted">📍 {{ propiedad.location }}</p>
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h1 class="h3 m-0">{{ propiedad.title|default:"Property" }}</h1>
+    <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">← Back</a>
+  </div>
+  <p class="text-muted mb-4">{{ propiedad.location }} · {{ propiedad.get_property_type_display }}</p>
 
-        <ul class="list-unstyled small">
-            <li><b>Área:</b> {{ propiedad.area_m2 }} m²</li>
-            <li><b>Rooms:</b> {{ propiedad.rooms }}</li>
-            <li><b>Bathrooms:</b> {{ propiedad.bathrooms }}</li>
-            <li><b>Parking Spaces:</b> {{ propiedad.parking_spaces }}</li>
-            <li><b>Garage:</b> {% if propiedad.parking_spaces > 0 %}Sí{% else %}No{% endif %}</li>
-            <li><b>Pets:</b> {% if propiedad.pets_allowed %}Permitidas{% else %}No permitidas{% endif %}</li>
-            <li><b>Property Type:</b> {{ propiedad.get_property_type_display }}</li>
-            <li><b>Stratum:</b> {{ propiedad.estrato }}</li>
-            <li><b>Floor:</b> {{ propiedad.floor }}</li>
-        <li><b>Amenities:</b> {% if propiedad.amenities %}{{ propiedad.amenities|join:", " }}{% else %}No amenities available{% endif %}</li>
-        </ul>
-
-        <h6>Description</h6>
-        <p>{{ propiedad. }}</p>
-    </div>
-
-<div class="interes mt-4 text-center">
-    <h6>Interested?</h6>
-    {% if user.is_authenticated %}
-    <button class="btn btn-dark mt-2" 
-        id="openContactBtn" 
-        data-url="{% url 'contact_form' propiedad.id %}">
-    Contact
-</button>
-    {% else %}
-        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-dark mt-2">
-            Contact
-        </a>
-        <p class="small text-muted mt-2">You need an account to contact the owner.</p>
-    {% endif %}
-</div>
-<div class="modal fade" id="contactModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content" id="contactModalContent">
+  {# ======== GALERÍA (Bootstrap Carousel) ======== #}
+  <div class="mb-4">
+    {% with galeria=propiedad.media.all %}
+      {% if galeria %}
+        <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
+          {% if galeria|length > 1 %}
+            <div class="carousel-indicators">
+              {% for m in galeria %}
+                <button type="button" data-bs-target="#propertyCarousel" data-bs-slide-to="{{ forloop.counter0 }}"
+                        class="{% if forloop.first %}active{% endif %}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+                        aria-label="Slide {{ forloop.counter }}"></button>
+              {% endfor %}
             </div>
+          {% endif %}
+
+          <div class="carousel-inner rounded-3 overflow-hidden border">
+            {% for m in galeria %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                {% if m.tipo == "video" %}
+                  {% if m.media_url %}
+                    <video class="d-block w-100" controls preload="metadata">
+                      <source src="{{ m.media_url }}">
+                      Your browser does not support the video tag.
+                    </video>
+                  {% else %}
+                    <div class="p-5 text-center text-muted">Video unavailable.</div>
+                  {% endif %}
+                {% else %}
+                  {% if m.media_url %}
+                    <img src="{{ m.media_url }}" class="d-block w-100" alt="Image">
+                  {% else %}
+                    <img src="{% static 'images/default.jpg' %}" class="d-block w-100" alt="No image">
+                  {% endif %}
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+
+          {% if galeria|length > 1 %}
+            <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          {% endif %}
         </div>
+      {% else %}
+        <img src="{% static 'images/default.jpg' %}" class="img-fluid rounded w-100" alt="No image">
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  {# ======== INFO PRINCIPAL ======== #}
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="mb-2">
+            <span class="d-block fw-bold text-success">
+              Total Price: $ {{ propiedad.price_cop|intcomma }} COP
+            </span>
+            {% if propiedad.price_cop and propiedad.area_m2 %}
+              {# price_m2 = price_cop / area_m2  --> widthratio A B C = A/B*C #}
+              <span class="badge text-bg-light">
+                COP/m²:
+                {% widthratio propiedad.price_cop propiedad.area_m2 1 as price_m2 %}
+                ${{ price_m2|floatformat:0|intcomma }}
+              </span>
+            {% endif %}
+          </div>
+
+          <ul class="list-unstyled small mb-0">
+            <li><b>Area:</b> {{ propiedad.area_m2|default:"—" }} m²</li>
+            {% if propiedad.area_privada_m2 %}<li><b>Private area:</b> {{ propiedad.area_privada_m2 }} m²</li>{% endif %}
+            <li><b>Rooms:</b> {{ propiedad.rooms|default:"—" }}</li>
+            <li><b>Bathrooms:</b> {{ propiedad.bathrooms|default:"—" }}</li>
+            <li><b>Parking:</b> {{ propiedad.parking_spaces|default:"—" }}</li>
+            <li><b>Floor:</b> {{ propiedad.floor|default:"—" }}</li>
+            {% if propiedad.estrato %}<li><b>Stratum:</b> {{ propiedad.estrato }}</li>{% endif %}
+            <li><b>Pets:</b> {{ propiedad.pets_allowed|yesno:"Allowed,Not allowed" }}</li>
+            <li><b>Furnished:</b> {{ propiedad.furnished|yesno:"Yes,No" }}</li>
+          </ul>
+        </div>
+      </div>
     </div>
+
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h6 class="fw-bold">Description</h6>
+          <p class="mb-0" style="white-space: pre-wrap;">{{ propiedad.description|default:"No description available." }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ======== AMENITIES ======== #}
+  {% if propiedad.amenities %}
+    <div class="card mb-4">
+      <div class="card-body">
+        <h6 class="fw-bold mb-2">Amenities</h6>
+        {% if propiedad.amenities.items %}
+          <ul class="mb-0">
+            {% for k,v in propiedad.amenities.items %}
+              <li><strong>{{ k|title }}:</strong> {{ v }}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          {# Si amenities es lista simple #}
+          {% if propiedad.amenities|length %}
+            <div>
+              {% for a in propiedad.amenities %}
+                <span class="chip me-1 mb-1">{{ a }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-muted">No amenities available.</div>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+  {# ======== ACCIONES ======== #}
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="{% url 'home' %}">Back to Home</a>
+    {% if propiedad.owner_id %}
+      <button class="btn btn-dark" id="openContactBtn" data-url="{% url 'contact_form' propiedad.id %}">
+        Contact
+      </button>
+    {% endif %}
+  </div>
+
 </div>
 
+{# ======== MODAL DE CONTACTO  ======== #}
+<div class="modal fade" id="contactModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" id="contactModalContent">
+      <!-- Se inyecta el partial por AJAX -->
+    </div>
+  </div>
+</div>
 
+{# Si tu proyecto ya incluye Bootstrap en base.html, puedes quitar estas líneas #}
+{# <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> #}
+
+<script>
+  (function () {
+    const btn = document.getElementById('openContactBtn');
+    if (!btn) return;
+
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      const url = this.dataset.url;
+      fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }})
+        .then(r => r.text())
+        .then(html => {
+          const container = document.getElementById('contactModalContent');
+          container.innerHTML = html;
+          const modal = new bootstrap.Modal(document.getElementById('contactModal'));
+          modal.show();
+        })
+        .catch(() => alert("Could not open contact form."));
+    });
+  })();
+</script>
+</body>
+</html>
