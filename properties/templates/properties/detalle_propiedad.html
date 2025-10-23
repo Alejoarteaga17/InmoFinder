@@ -1,0 +1,87 @@
+{% load static %}
+{% load humanize %}
+
+<div class="modal-header">
+    <h5 class="modal-title">{{ propiedad.title }}</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+</div>
+
+<div class="modal-body detalle-propiedad">
+
+    <!-- Galería tipo slider -->
+    <div class="galeria mb-3">
+        {% if propiedad.media.exists %}
+        <div class="slider">
+            {% for media in propiedad.media.all %}
+                {% if media.tipo == "imagen" %}
+                    <div class="slide">
+                        {% if media.archivo %}
+                            <img src="{{ media.archivo.url }}" class="img-fluid rounded" alt="{{ propiedad.nombre }}">
+                        {% elif media.url %}
+                            <img src="{{ media.url }}" class="img-fluid rounded" alt="{{ propiedad.nombre }}">
+                        {% else %}
+                            <img src="{% static 'images/default.jpg' %}" class="img-fluid rounded" alt="Sin imagen disponible">
+                        {% endif %}
+                    </div>
+                {% elif media.tipo == "video" %}
+                    <div class="slide">
+                        <video controls class="w-100 rounded">
+                            {% if media.archivo %}
+                                <source src="{{ media.archivo.url }}" type="video/mp4">
+                            {% else %}
+                                <source src="{% static 'images/muestra.mp4' %}" type="video/mp4">
+                            {% endif %}
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% else %}
+            <img src="{% static 'images/default.jpg' %}" class="img-fluid rounded w-100" alt="Sin imagen">
+        {% endif %}
+    </div>
+
+    <!-- Información de la propiedad -->
+    <div class="info-propiedad">
+        <p class="fw-bold text-success">Precio Total: $ {{ propiedad.price_cop|intcomma }} COP</p>
+        <p>
+            <span class="price-m2-badge">
+                ${{ propiedad.price_m2|intcomma }} COP/m²
+            </span>
+        </p>
+
+        <p class="text-muted">📍 {{ propiedad.location }}</p>
+
+        <ul class="list-unstyled small">
+            <li><b>Área:</b> {{ propiedad.area_m2 }} m²</li>
+            <li><b>Rooms:</b> {{ propiedad.rooms }}</li>
+            <li><b>Bathrooms:</b> {{ propiedad.bathrooms }}</li>
+            <li><b>Parking Spaces:</b> {{ propiedad.parking_spaces }}</li>
+            <li><b>Garage:</b> {% if propiedad.parking_spaces > 0 %}Sí{% else %}No{% endif %}</li>
+            <li><b>Pets:</b> {% if propiedad.pets_allowed %}Permitidas{% else %}No permitidas{% endif %}</li>
+            <li><b>Property Type:</b> {{ propiedad.get_property_type_display }}</li>
+            <li><b>Stratum:</b> {{ propiedad.estrato }}</li>
+            <li><b>Floor:</b> {{ propiedad.floor }}</li>
+        <li><b>Amenities:</b> {% if propiedad.amenities %}{{ propiedad.amenities|join:", " }}{% else %}No amenities available{% endif %}</li>
+        </ul>
+
+    <h6>Description</h6>
+    <p>{{ propiedad.description }}</p>
+    </div>
+
+<div class="interes mt-4 text-center">
+    <h6>Interested?</h6>
+    {% if user.is_authenticated %}
+    <button class="btn btn-dark mt-2" 
+        id="openContactBtn" 
+        data-url="{% url 'contact_form' propiedad.id %}">
+    Contact
+</button>
+    {% else %}
+        <a href="{% url 'login' %}?next={% url 'detalle_propiedad' propiedad.id %}?modal=1">Contact owner</a>
+        <p class="small text-muted mt-2">You need an account to contact the owner.</p>
+    {% endif %}
+</div>
+
+

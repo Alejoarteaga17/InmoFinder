@@ -1,0 +1,48 @@
+<!-- templates/403.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>403 · Acceso denegado</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root { --bg:#fafafa; --card:#fff; --muted:#666; --border:#eee; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin:0; background:var(--bg); }
+    .wrap { max-width: 760px; margin: 6rem auto; padding: 0 1rem; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:2rem; }
+    h1 { margin:0 0 .5rem; font-size:1.8rem; }
+    p { color:#333; line-height:1.6; margin:.5rem 0; }
+    .muted { color:var(--muted); font-size:.9rem; }
+    .actions { margin-top:1rem; display:flex; gap:.5rem; flex-wrap:wrap; }
+    a.button { display:inline-block; padding:.6rem 1rem; border-radius:10px; border:1px solid #ddd; text-decoration:none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>403 · Acceso denegado</h1>
+      <p>{{ reason_human }}</p>
+      <p class="muted">Ruta: <code>{{ path }}</code></p>
+
+      {% if user.is_authenticated %}
+        <p class="muted">Has iniciado sesión como: <strong>{{ user.email }}</strong></p>
+        <div class="actions">
+          <a class="button" href="/">Ir al inicio</a>
+          {% if user.is_admin %}
+            <a class="button" href="/admin/">Ir al panel de Django</a>
+            <a class="button" href="/properties/admin-dashboard/">Ir al Admin Dashboard</a>
+          {% endif %}
+          {% if user.is_propietario %}
+            <a class="button" href="/properties/dashboard/">Ir al Dashboard de Propietario</a>
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="actions">
+          <a class="button" href="/users/login/?next={{ path|urlencode }}">Iniciar sesión</a>
+          <a class="button" href="/">Ir al inicio</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

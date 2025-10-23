@@ -1,0 +1,39 @@
+{% extends "properties/base.html" %}
+{% block content %}
+<div class="container mt-4">
+<h2>My Properties</h2>
+<a href="{% url 'create' %}" class="btn btn-primary mb-3">Add Property</a>
+
+{% if propiedades %}
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Location</th>
+        <th>Price</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for propiedad in propiedades %}
+        <tr>
+        <td>{{ propiedad.title }}</td>
+        <td>{{ propiedad.location }}</td>
+        <td>${{ propiedad.price_cop }}</td>
+        <td>
+            <a href="{% url 'edit' propiedad.id %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'delete' propiedad.id %}" class="btn btn-sm btn-danger">Delete</a>
+            {% if propiedad.media.all %}
+                <a href="{% url 'media_list' propiedad.id %}" class="btn btn-sm btn-info">View Media</a>
+            {% endif %}
+
+        </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No properties registered yet.</p>
+{% endif %}
+</div>
+{% endblock %}

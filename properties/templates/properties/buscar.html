@@ -1,0 +1,27 @@
+{% extends "properties/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="container py-4">
+
+  <h1 class="mb-4 text-center">Search Properties</h1>
+
+  <!-- Buscador -->
+  <div class="d-flex justify-content-center mb-4">
+      {% include "properties/partials/buscador.html" %}
+  </div>
+
+  <h2 class="mb-4 text-center">Results</h2>
+
+  <div class="row">
+    {% for propiedad in propiedades %}
+      {% include "properties/partials/property_card.html" %}
+    {% empty %}
+      <p class="text-center">We couldn´t find any properties</p>
+      <a class="text-center" href="{% url 'home' %}">Back to home</a>
+    {% endfor %}
+  </div>
+
+</section>
+<script src="{% static 'js/filtros.js' %}"></script>
+{% endblock %}

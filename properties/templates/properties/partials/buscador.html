@@ -1,0 +1,68 @@
+<!-- Filtros adicionales -->
+<form method="get" action="{% url 'buscar_propiedades' %}" class="row g-2 filters mb-4 alineado-filtros">
+
+    <!-- ====== PRECIO con input + range ====== -->
+    <div class="col-md-3">
+        <label for="precio_min" class="form-label">Precio mín. (COP)</label>
+        <input type="number" min="0" step="50000" id="precio_min" name="precio_min" class="form-control mb-1"
+                placeholder="Mín."
+                value="{{ request.GET.precio_min|default_if_none:'' }}">
+        <input type="range" id="precio_min_range" min="0" max="1000000000" step="50000">
+    </div>
+
+    <div class="col-md-3">
+        <label for="precio_max" class="form-label">Precio máx. (COP)</label>
+        <input type="number" min="0" step="50000" id="precio_max" name="precio_max" class="form-control mb-1"
+                placeholder="Máx."
+                value="{{ request.GET.precio_max|default_if_none:'' }}">
+        <input type="range" id="precio_max_range" min="0" max="1000000000" step="50000">
+    </div>
+
+    <!-- ====== OTROS FILTROS ====== -->
+    <div class="col-md-2">
+        <input type="number" min="1" name="rooms" class="form-control"
+                placeholder="Rooms" value="{{ request.GET.rooms|default_if_none:'' }}">
+    </div>
+    <div class="col-md-2">
+        <input type="number" min="1" name="bathrooms" class="form-control"
+                placeholder="Bathrooms" value="{{ request.GET.bathrooms|default_if_none:'' }}">
+    </div>
+    <div class="col-md-2">
+        <input type="number" min="1" name="parking_spaces" class="form-control"
+                placeholder="Parking Spaces" value="{{ request.GET.parking_spaces|default_if_none:'' }}">
+    </div>
+    <div class="col-md-2">
+        <input type="number" min="1" name="area_min" class="form-control"
+                placeholder="Área mín. (m²)" value="{{ request.GET.area_min|default_if_none:'' }}">
+    </div>
+    <div class="col-md-2">
+        <input type="number" min="1" name="area_max" class="form-control"
+                placeholder="Área máx. (m²)" value="{{ request.GET.area_max|default_if_none:'' }}">
+    </div>
+    <div class="col-md-2">
+        <select name="tipo" class="form-select">
+            <option value="">Type</option>
+            <option value="Apartamento"   {% if request.GET.tipo == "Apartamento" %}selected{% endif %}>Piso</option>
+            <option value="Casa"   {% if request.GET.tipo == "Casa" %}selected{% endif %}>Casa</option>
+            <option value="Lote" {% if request.GET.tipo == "Lote" %}selected{% endif %}>Chalet</option>
+            <option value="Oficina"  {% if request.GET.tipo == "Oficina" %}selected{% endif %}>Oficina</option>
+            <option value="Dúplex" {% if request.GET.tipo == "Dúplex" %}selected{% endif %}>Dúplex</option>
+            <option value="Estudio"{% if request.GET.tipo == "Estudio"%}selected{% endif %}>Estudio</option>
+            <option value="Loft"   {% if request.GET.tipo == "Loft" %}selected{% endif %}>Loft</option>
+        </select>
+    </div>
+    <div class="col-md-2 form-check height-100 d-flex align-items-center">
+        <input type="checkbox" class="form-check-input" name="garaje" value="1"
+                {% if request.GET.garaje == "1" %}checked{% endif %}>
+        <label class="form-check-label"> Garage</label>
+    </div>
+    <div class="col-md-2 form-check height-100 d-flex align-items-center">
+        <input type="checkbox" class="form-check-input" name="mascotas" value="1"
+                {% if request.GET.mascotas == "1" %}checked{% endif %}>
+        <label class="form-check-label"> Pets</label>
+    </div>
+
+    <div class="col-12 d-flex justify-content-end">
+        <button type="submit" class="btn btn-success btn-pill">Apply filters</button>
+    </div>
+</form>

@@ -1,0 +1,47 @@
+{% load static %}
+{% load humanize %}
+<div class="col-md-3 mb-4">
+  <div class="card property-card shadow-sm h-100 position-relative">
+
+    <!-- ❤ Botón de favorito -->
+    {% if user.is_authenticated %}
+      <button 
+        type="button" 
+        class="btn btn-link p-0 position-absolute top-0 end-0 m-2 toggle-favorite" 
+        data-property-id="{{ propiedad.id }}"
+        data-id="{{ propiedad.id }}"
+        data-toggle-url="{% url 'toggle_favorite' propiedad.id %}"
+        aria-label="Toggle Favorite">
+        {% if propiedad.id in favorite_ids %}
+          <i class="bi bi-heart-fill text-danger fs-4"></i>
+        {% else %}
+          <i class="bi bi-heart text-dark fs-4"></i>
+        {% endif %}
+      </button>
+    {% endif %}
+
+
+    <a href="{% url 'detalle_propiedad' propiedad.id %}" 
+        class="view-property" 
+        data-bs-toggle="modal" 
+        data-bs-target="#propertyModal">
+    {% if propiedad.portada %}
+      <img src="{{ propiedad.portada }}" class="card-img-top cover-img" alt="{{ propiedad.nombre }}">
+    {% else %}
+      <img src="{% static 'images/default.jpg' %}" class="card-img-top cover-img" alt="Sin imagen">
+    {% endif %}
+    </a>
+    <div class="card-body text-center">
+      <h5 class="card-title">{{ propiedad.title }}</h5>
+      <p class="fw-bold text-dark mb-1">${{ propiedad.price_cop|intcomma }} COP</p>
+      <span class="price-m2-badge d-inline-block mb-2">
+        ${{ propiedad.price_m2| intcomma }} COP/m²
+      </span>
+      <p class="text-muted">📍 {{ propiedad.location }}</p>
+      <p class="card-text text-truncate"
+          style="-webkit-line-clamp:3; line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; display:-webkit-box;">
+          {{ propiedad.description }}
+      </p>
+    </div>
+  </div>
+</div>
