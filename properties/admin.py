@@ -9,6 +9,8 @@ class MediaPropiedadInline(admin.TabularInline):
     extra = 1
 
 class PropiedadAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("id", "title", "location", "price_cop", "price_m2_display")
+    readonly_fields = ("price_m2_display",)
+    search_fields = ("title", "location")
 
 admin.site.register(Propiedad,PropiedadAdmin)

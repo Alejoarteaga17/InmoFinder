@@ -35,7 +35,11 @@
       <h5 class="card-title">{{ propiedad.title }}</h5>
       <p class="fw-bold text-dark mb-1">${{ propiedad.price_cop|intcomma }} COP</p>
       <span class="price-m2-badge d-inline-block mb-2">
-        ${{ propiedad.price_m2| intcomma }} COP/m²
+        {% if propiedad.price_m2_display %}
+          ${{ propiedad.price_m2_display|intcomma }} COP/m²
+        {% else %}
+          <small class="text-muted">Precio por m² no disponible</small>
+        {% endif %}
       </span>
       <p class="text-muted">📍 {{ propiedad.location }}</p>
       <p class="card-text text-truncate"
