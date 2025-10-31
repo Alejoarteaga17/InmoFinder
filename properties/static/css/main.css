@@ -22,6 +22,8 @@ header {
   padding-bottom: 0.5rem;
   color: var(--ink);
   background-color: #d4d0d05b;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
 }
 
 /* Marca */
@@ -115,6 +117,13 @@ header {
   border: var(--btn-stroke) solid var(--brand-brown, var(--ink));
   font-weight: 600 !important;
 }
+
+.filters {
+  padding: .8rem 1.5rem;
+  border-radius: 25px;
+  background-color: #d4d0d05b;
+}
+
 .btn-filter {
   white-space: nowrap;
   flex: 0 0 auto;
@@ -128,11 +137,32 @@ header {
   color: var(--brand-brown, var(--ink));
   background: transparent;
   line-height: 1;
-  transition: .2s ease;
+  transition: all 0.3s ease;
 }
 .btn-filter:hover {
   background: var(--brand-brown, var(--ink));
   color: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  border-color: var(--muted);
+}
+.form-check-input {
+  padding: auto;
+  width: .2rem;
+  height: .2rem;
+  border-radius: 50%;
+  border: 2px solid var(--muted);
+  background-color: #fff;
+  transition: all 0.2s ease;
+}
+.form-check-input:checked {
+  background-color: var(--brand-brown, var(--ink));
+  border-color: var(--brand-brown, var(--ink));
+}
+
+/* Alineación común buscador + chips + filtros */
+.alineado-filtros {
+  margin-left: .5rem;  /* 👈 ajusta este valor hasta que quede alineado */
 }
 
 /* Chips */
@@ -141,11 +171,11 @@ header {
   font-size: .95rem;
   padding: .5rem 1.4rem;
   border-radius: 50px;
-  background: #444444;   /* 👈 gris (puedes usar #888 o el gris de Bootstrap) */
+  background: #444444;
   text-decoration: none;
-  color: #f3efef;           /* 👈 texto gris oscuro */
+  color: #f3efef;
   transition: all 0.3s ease;
-  border: none;          /* quita el borde para que no se vea raro */
+  border: none;
 }
 .chips .chip:hover {
   transform: translateY(-3px);
@@ -200,10 +230,7 @@ header {
   margin-bottom: 0.5rem;
 }
 
-/* Alineación común buscador + chips + filtros */
-.alineado-filtros {
-  margin-left: 2rem;  /* 👈 ajusta este valor hasta que quede alineado */
-}
+
 
 /* ===== Styles for Login & Sign Up pages ===== */
 .auth-page .btn {
@@ -262,28 +289,20 @@ header {
 
 /* --- Panel lateral personalizado (offcanvas) --- */
 .offcanvas {
-  background-color: #f9f9f9;
+  background-color: #f5f3f3;
   box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
   border-top-left-radius: 12px;
   border-bottom-left-radius: 12px;
 }
 
-.offcanvas-header {
-  border-bottom: 1px solid #ddd;
-}
 
 .offcanvas-body a {
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--ink);
   transition: color 0.2s ease;
 }
 
 .offcanvas-body a:hover {
   color: var(--ink);
 }
-
-
-
-
-
-
