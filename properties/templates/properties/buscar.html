@@ -1,10 +1,12 @@
 {% extends "properties/base.html" %}
 {% load static %}
-
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+{% endblock %}
 {% block content %}
 <section class="container py-4">
 
-  <h1 class="mb-4 text-center">Search Properties</h1>
+  <h1 class="mb-4 text-center">Filters</h1>
 
   <!-- Buscador -->
   <div class="d-flex justify-content-center mb-4">
@@ -21,6 +23,45 @@
       <a class="text-center" href="{% url 'home' %}">Back to home</a>
     {% endfor %}
   </div>
+
+  {% if propiedades.paginator.num_pages > 1 %}
+  <nav class="mt-4" aria-label="Search results pages">
+    <ul class="pagination justify-content-center">
+      {# Previous #}
+      <li class="page-item {% if not propiedades.has_previous %}disabled{% endif %}">
+        <a class="page-link"
+           {% if propiedades.has_previous %}
+             href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ propiedades.previous_page_number }}"
+           {% else %}
+             href="#" aria-disabled="true" tabindex="-1"
+           {% endif %}>Previous</a>
+      </li>
+
+      {# Page numbers window #}
+      {% for num in propiedades.paginator.page_range %}
+        {% if num == propiedades.number %}
+          <li class="page-item active" aria-current="page"><span class="page-link">{{ num }}</span></li>
+        {% elif num >= propiedades.number|add:'-2' and num <= propiedades.number|add:'2' %}
+          <li class="page-item"><a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ num }}">{{ num }}</a></li>
+        {% elif num == 1 or num == propiedades.paginator.num_pages %}
+          <li class="page-item"><a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ num }}">{{ num }}</a></li>
+        {% elif num == propiedades.number|add:'-3' or num == propiedades.number|add:'3' %}
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+        {% endif %}
+      {% endfor %}
+
+      {# Next #}
+      <li class="page-item {% if not propiedades.has_next %}disabled{% endif %}">
+        <a class="page-link"
+           {% if propiedades.has_next %}
+             href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ propiedades.next_page_number }}"
+           {% else %}
+             href="#" aria-disabled="true" tabindex="-1"
+           {% endif %}>Next</a>
+      </li>
+    </ul>
+  </nav>
+  {% endif %}
 
 </section>
 <script src="{% static 'js/filtros.js' %}"></script>

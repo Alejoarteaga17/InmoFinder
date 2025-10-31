@@ -344,9 +344,15 @@ def buscar_propiedades(request):
     if request.user.is_authenticated:
         favorite_ids = list(Favorite.objects.filter(user=request.user).values_list('propiedad_id', flat=True))
 
+    # Build querystring without page for clean pagination links
+    params = request.GET.copy()
+    params.pop('page', None)
+    querystring = params.urlencode()
+
     return render(request, "properties/buscar.html", {
         "propiedades": page_obj,
-        "favorite_ids": favorite_ids
+        "favorite_ids": favorite_ids,
+        "querystring": querystring,
     })
 
 @login_required

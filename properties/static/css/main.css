@@ -13,13 +13,15 @@
 
 html, body {
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji", "Segoe UI Symbol";
-  background: #fff;
+  background: #f5f3f3;
 }
 
 /* Header */
 header {
-  padding-top: var(--header-pt);
-  padding-bottom: var(--header-pb);
+  padding-top: 0rem;
+  padding-bottom: 0.5rem;
+  color: var(--ink);
+  background-color: #d4d0d05b;
 }
 
 /* Marca */
@@ -47,6 +49,13 @@ header {
   font-weight: 300;
   line-height: 1.1;
 }
+.hero img.hero-img {
+  border-radius: 24px;
+  width: 468px !important;
+  height: 437px !important;
+  max-width: none !important; /* override .img-fluid */
+  object-fit: cover;
+}
 
 /* Search */
 .search { position: relative; }
@@ -67,8 +76,9 @@ header {
   border: var(--btn-stroke) solid var(--muted-3);
   color: #333;
   box-shadow: none;
+  background-color: #d4d0d05b;
 }
-.search-input::placeholder { color: var(--muted-2); }
+.search-input::placeholder { color:  #4444445b var(--muted); }
 .search-icon {
   position: absolute;
   left: 14px;
@@ -81,7 +91,7 @@ header {
   justify-content: center;
   border-radius: 50%;
   background: transparent;
-  color: var(--muted);
+  color: #4444445b var(--muted);
   pointer-events: none;
 }
 
@@ -95,14 +105,14 @@ header {
   font-size:.95rem;
 }
 .btn-signup {
-  background: var(--ink);
+  background: var(--brand-brown, var(--ink));
   color: #fff;
-  border: var(--btn-stroke) solid var(--ink);
+  border: var(--btn-stroke) solid var(--brand-brown, var(--ink));
 }
 .btn-login {
   background: transparent;
-  color: var(--ink);
-  border: var(--btn-stroke) solid var(--ink);
+  color: var(--brand-brown, var(--ink));
+  border: var(--btn-stroke) solid var(--brand-brown, var(--ink));
   font-weight: 600 !important;
 }
 .btn-filter {
@@ -114,14 +124,14 @@ header {
   justify-content: center;
   padding: 0 1.6rem;
   border-radius: var(--radius-pill);
-  border: var(--btn-stroke) solid var(--ink);
-  color: var(--ink);
+  border: var(--btn-stroke) solid var(--brand-brown, var(--ink));
+  color: var(--brand-brown, var(--ink));
   background: transparent;
   line-height: 1;
   transition: .2s ease;
 }
 .btn-filter:hover {
-  background: var(--ink);
+  background: var(--brand-brown, var(--ink));
   color: #fff;
 }
 
@@ -129,11 +139,11 @@ header {
 .chips { gap: .5rem; }
 .chips .chip {
   font-size: .95rem;
-  padding: .6rem 1.4rem;
+  padding: .5rem 1.4rem;
   border-radius: 50px;
-  background: #6c757d;   /* 👈 gris (puedes usar #888 o el gris de Bootstrap) */
+  background: #444444;   /* 👈 gris (puedes usar #888 o el gris de Bootstrap) */
   text-decoration: none;
-  color: #fff;           /* 👈 texto blanco */
+  color: #f3efef;           /* 👈 texto gris oscuro */
   transition: all 0.3s ease;
   border: none;          /* quita el borde para que no se vea raro */
 }
@@ -147,7 +157,7 @@ header {
 /* Microespacios hero */
 .space-h1-lead { margin-top:1.4rem; }
 .space-lead-search { margin-top:1.6rem; }
-.space-search-chips { margin-top:1.2rem; }
+.space-search-chips { margin-top:0.2rem; }
 
 /* Imagen hero */
 .hero-img { border-radius:24px; }
@@ -155,13 +165,14 @@ header {
 /* Carrusel controles */
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
-  filter: invert(40%) sepia(90%) saturate(400%) hue-rotate(160deg);
+  filter: invert(1);
   width: 40px;
   height: 40px;
+  align-items: center;
 }
 .carousel-control-prev,
 .carousel-control-next {
-  background: rgba(255,255,255,0.7);
+  background: #444444;
   border-radius: 50%;
   width: 50px;
   height: 50px;
@@ -170,7 +181,7 @@ header {
 }
 .carousel-control-prev:hover,
 .carousel-control-next:hover {
-  background: rgba(255,255,255,0.95);
+  background: #222222;
 }
 
 /* Utilidades */
@@ -196,12 +207,12 @@ header {
 
 /* ===== Styles for Login & Sign Up pages ===== */
 .auth-page .btn {
-    background-color: #444444; /* mismo color que el resto */
-    border: none;
-    border-radius: 25px;  /* bien redondeado */
-    color: #fff;
-    font-weight: 500;
-    padding: 10px 18px;
+  background-color: var(--brand-brown, #444444); /* unified brown */
+  border: none;
+  border-radius: 25px;  /* bien redondeado */
+  color: #fff;
+  font-weight: 500;
+  padding: 10px 18px;
 }
 
 .auth-page .form-control {
@@ -216,9 +227,8 @@ header {
   position: absolute;
   top: 3rem;
   right: 0;
-  background: #fff;
+  background: #444444;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   padding: 0.5rem 0;
   display: none;
   flex-direction: column;

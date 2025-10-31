@@ -1,9 +1,12 @@
 {% extends "properties/base.html" %}
+{% load static %}
+{% block body_class %}auth-bg-page{% endblock %}
 {% block content %}
-<div class="auth-page container mt-5">
+<section class="auth-bg">
+<div class="auth-page container py-5">
   <div class="row justify-content-center">
     <div class="col-md-8">
-      <div class="card shadow-lg border-0 rounded-4">
+      <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
         <div class="row g-0">
           <div class="col-md-6 p-4 border-end">
             <h3 class="text-center mb-3">Sign Up</h3>
@@ -39,14 +42,10 @@
             <div class="d-grid mb-3">
               <button type="submit" class="btn">Sign up</button>
             </div>
-            <p class="text-center small">
-              Already have an account?
-              <a href="{% url 'login' %}">Login</a>
-            </p>
             <div class="text-danger small">{{ form.non_field_errors }}</div>
           </form>
           </div>
-          <div class="col-md-6 bg-light p-4 d-flex flex-column justify-content-center text-center">
+          <div class="col-md-6 bg-light p-4 d-flex flex-column justify-content-center text-center rounded-end-4">
             <h4 class="mb-3">Welcome 👋</h4>
             <p class="text-muted">If you already have an account, log in to continue.</p>
             <a href="{% url 'login' %}" class="btn">Login</a>
@@ -55,5 +54,7 @@
       </div>
     </div>
   </div>
+  </div>
 </div>
+ </section>
 {% endblock %}

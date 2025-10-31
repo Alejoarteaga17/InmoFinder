@@ -18,13 +18,14 @@
 }
 
 .filters button {
-    background: #333;
+    background: var(--brand-brown, #333);
     color: #fff;
     font-weight: bold;
+    border-color: var(--brand-brown, #333);
 }
 
 .filters button:hover {
-    background: #000;
+    background: var(--brand-brown-600, #000);
 }
 
 /* --- Sección de recomendaciones / propiedades --- */
@@ -37,7 +38,7 @@
 
 .prop-card {
     background: #fff;
-    border-radius: 12px;
+    border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -102,15 +103,15 @@
     display: inline-block;
     margin-top: 10px;
     padding: 8px 12px;
-    background: #007BFF;
+    background: var(--brand-brown, #007BFF);
     color: #fff;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 14px;
     text-align: center;
 }
 
 .prop-card a:hover {
-    background: #0056b3;
+    background: var(--brand-brown-600, #0056b3);
 }
 
 .detalle-propiedad {
@@ -186,4 +187,55 @@
     margin-top: 20px;
     margin-bottom: 8px;
     font-size: 18px;
+}
+
+/* Center the interest block inside its grid cell (row with the map) */
+.detalle-propiedad .interes {
+    align-self: center;       /* vertical center within the grid row */
+    justify-self: center;     /* horizontal center within the column */
+    display: grid;
+    place-items: center;      /* center inner content */
+}
+
+/* ===== Consistent card layout for homepage/search results ===== */
+/* Fix image height and cover fit */
+.property-card .cover-img {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+}
+
+/* Make body a vertical stack with predictable blocks */
+.property-card .card-body {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Title: clamp to 2 lines and reserve height */
+.property-card .card-title {
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2; /* standard property for compatibility */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: calc(1.2em * 2);
+}
+
+/* Badge: ensure same block height even when text varies */
+.property-card .price-m2-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+}
+
+/* Location line: keep one-line height */
+.property-card p.text-muted {
+    min-height: 1.25rem;
+}
+
+/* Description (already clamped inline): reserve 3 lines height for stability */
+.property-card .card-text {
+    line-height: 1.2;
+    min-height: calc(1.2em * 3);
 }
