@@ -92,8 +92,10 @@ def buscar_propiedades(query_text, top_k=TOP_K):
 
     resultados = []
     for idx in top_idx:
-        prop = Propiedad.objects.get(id=property_ids[idx])
+        prop_id = property_ids[idx]
+        prop = Propiedad.objects.get(id=prop_id)
         resultados.append({
+            "id": prop_id,
             "title": prop.title,
             "location": prop.location,
             "price": prop.price_cop,

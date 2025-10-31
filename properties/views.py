@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
-from django.db.models import Q, Prefetch
+from django.db.models import Q, Prefetch, Case, When, IntegerField
 from .models import Propiedad, MediaPropiedad
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -14,6 +14,11 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import JsonResponse
 from .models import Favorite, Propiedad
+try:
+    # Importar la búsqueda por embeddings (carga el modelo una sola vez por proceso)
+    from properties.management.commands.embeddings import buscar_propiedades as emb_buscar
+except Exception:
+    emb_buscar = None  # fallback si no está disponible
 
 
 def home(request):
@@ -262,14 +267,32 @@ def contact_owner(request, propiedad_id):
 def buscar_propiedades(request):
     propiedades = Propiedad.objects.all()
 
-    # Texto libre (map to new fields)
+    # Texto libre: usar embeddings si hay consulta y el motor está disponible; si falla, usar icontains
     search = request.GET.get("search")
+    ids_ranked = []
+    used_embeddings = False
     if search:
-        propiedades = propiedades.filter(
-            Q(title__icontains=search) |
-            Q(description__icontains=search) |
-            Q(location__icontains=search)
-        )
+        if emb_buscar is not None:
+            try:
+                # Obtener un conjunto razonable de candidatos para luego aplicar filtros
+                results = emb_buscar(search, top_k=500)
+                ids_ranked = [r.get("id") for r in results if r.get("id")]
+                if ids_ranked:
+                    propiedades = propiedades.filter(id__in=ids_ranked)
+                    used_embeddings = True
+            except Exception:
+                # Fallback a búsqueda simple
+                propiedades = propiedades.filter(
+                    Q(title__icontains=search) |
+                    Q(description__icontains=search) |
+                    Q(location__icontains=search)
+                )
+        else:
+            propiedades = propiedades.filter(
+                Q(title__icontains=search) |
+                Q(description__icontains=search) |
+                Q(location__icontains=search)
+            )
 
     # Filtros numéricos (map names)
     precio_min = request.GET.get("precio_min")
@@ -307,7 +330,7 @@ def buscar_propiedades(request):
     if request.GET.get("mascotas") == "1":
         propiedades = propiedades.filter(pets_allowed=True)
 
-    # Orden
+    # Orden: si usamos embeddings y no se especifica otro orden, preservamos ranking por similitud
     orden = request.GET.get("orden")
     mapping = {
         "precio_asc": "price_cop",
@@ -318,6 +341,10 @@ def buscar_propiedades(request):
     }
     if orden in mapping:
         propiedades = propiedades.order_by(mapping[orden])
+    elif used_embeddings and ids_ranked:
+        # Preservar el orden de ids_ranked
+        when_list = [When(id=pk, then=pos) for pos, pk in enumerate(ids_ranked)]
+        propiedades = propiedades.order_by(Case(*when_list, output_field=IntegerField()))
 
     # Prefetch media + paginación
     media_prefetch = Prefetch('media', queryset=MediaPropiedad.objects.all())
