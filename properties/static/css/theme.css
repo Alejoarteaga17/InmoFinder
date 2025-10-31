@@ -138,3 +138,19 @@ header .btn-link, header .btn-link i {
 	background-repeat: no-repeat;
 }
 
+/* --- Exception: favorite (heart) button must remain transparent --- */
+.toggle-favorite,
+.toggle-favorite.btn,
+.toggle-favorite.btn-link {
+	background-color: transparent !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
+}
+.toggle-favorite:hover,
+.toggle-favorite:focus,
+.toggle-favorite:active {
+	background-color: transparent !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
+}
+

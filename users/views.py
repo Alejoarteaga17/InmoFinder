@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from .forms import RegisterForm, LoginForm
+from .forms import RegisterForm, LoginForm, UserUpdateForm
 from django.contrib.auth import login, logout
-from django.contrib.auth.views import LoginView as AuthLoginView
+from django.contrib.auth.views import LoginView as AuthLoginView, PasswordChangeView
 from django.shortcuts import redirect
 from django.views.generic import FormView
 from properties.models import Favorite
+from django.contrib import messages
 
 # Create your views here.
 
@@ -74,6 +75,21 @@ def error_403(request, exception=None):
 def profile(request):
     return render(request, "users/profile.html")   
 
+
+@login_required
+def edit_profile(request):
+    """Permite al usuario autenticado editar su información básica."""
+    if request.method == "POST":
+        form = UserUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile has been updated.")
+            return redirect("profile")
+    else:
+        form = UserUpdateForm(instance=request.user)
+
+    return render(request, "users/edit_profile.html", {"form": form})
+
 @login_required
 def favorites_list(request):
     from django.db.models import Prefetch
@@ -105,3 +121,12 @@ def favorites_list(request):
         'propiedades': propiedades,
         'favorite_ids': favorite_ids
 })
+
+
+class ChangePasswordView(PasswordChangeView):
+    template_name = "users/change_password.html"
+    success_url = "/users/profile/"
+
+    def form_valid(self, form):
+        messages.success(self.request, "Your password has been changed.")
+        return super().form_valid(form)

@@ -47,19 +47,15 @@
           <i class="bi bi-person fs-3"></i>
         </a>
       {% endif %}
-
       <!-- Botón hamburguesa (siempre visible) -->
-      <button class="btn text-dark p-0" type="button"
+      <button class="menu p-0"
               data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas"
-              aria-controls="menuOffcanvas" style="background:transparent">
+              aria-controls="menuOffcanvas">
         <i class="bi bi-list fs-2"></i>
       </button>
     </div>
-
   </nav>
 </header>
-
-
 
 <!-- Panel lateral -->
 <div class="offcanvas offcanvas-end" tabindex="-1" id="menuOffcanvas" aria-labelledby="menuOffcanvasLabel">
@@ -76,7 +72,7 @@
       {% elif user.profile.is_owner %}
         <a href="{% url 'owner_dashboard' %}" class="text-decoration-none text-dark">Dashboard Owner</a>
       {% endif %}
-      <a href="{% url 'logout' %}" class="text-decoration-none text-dark">Log Out</a>
+      <a href="{% url 'logout' %}" class="text-decoration-none" style="color: #cc0000">Log Out</a>
     
     {% endif %}
   </div>

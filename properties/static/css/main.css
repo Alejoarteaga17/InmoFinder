@@ -20,10 +20,17 @@ html, body {
 header {
   padding-top: 0rem;
   padding-bottom: 0.5rem;
+  padding-right: -.2rem;
   color: var(--ink);
   background-color: #d4d0d05b;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
+}
+.menu{
+  background-color: transparent;
+  border: none;
+  border-radius: 12px;
+  margin-right: 0;
 }
 
 /* Marca */
