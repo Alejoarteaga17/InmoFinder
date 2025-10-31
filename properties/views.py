@@ -42,10 +42,38 @@ def home(request):
     favorite_ids = []
     if request.user.is_authenticated:
         favorite_ids = list(Favorite.objects.filter(user=request.user).values_list('propiedad_id', flat=True))
-    
+
+    # -- Propiedades vistas recientemente (sesión) --
+    recent_ids = request.session.get('recently_viewed', [])
+    recent_props = []
+    if recent_ids:
+        # Tomar máximo 4, preservar orden
+        top_ids = list(recent_ids)[:4]
+        when_list = [When(id=pk, then=pos) for pos, pk in enumerate(top_ids)]
+        recent_qs = (
+            Propiedad.objects.filter(id__in=top_ids)
+            .prefetch_related(media_prefetch)
+            .order_by(Case(*when_list, output_field=IntegerField()))
+        )
+        # Agregar portada a cada propiedad reciente
+        tmp = []
+        for propiedad in recent_qs:
+            portada = None
+            for media in propiedad.media.all(): # type: ignore
+                if media.archivo:
+                    portada = media.archivo.url
+                    break
+                elif media.url:
+                    portada = media.url
+                    break
+            propiedad.portada = portada # type: ignore
+            tmp.append(propiedad)
+        recent_props = tmp
+
     return render(request, "properties/home.html", {
         "propiedades": qs,
-        "favorite_ids": favorite_ids
+        "favorite_ids": favorite_ids,
+        "recent_props": recent_props,
     })
 
 @login_required
@@ -208,6 +236,19 @@ class PropiedadDeleteView(LoginRequiredMixin, PropietarioRequiredMixin, RoleSucc
 # --- DETALLE DE PROPIEDAD ---
 def detalle_propiedad(request, propiedad_id):
     propiedad = get_object_or_404(Propiedad, id=propiedad_id)
+    # Registrar en sesión como recientemente vista (LRU simple)
+    try:
+        rv = request.session.get('recently_viewed', [])
+        # Normalizar a ints y deduplicar moviendo al frente
+        rv = [int(x) for x in rv if x is not None]
+        if propiedad.id in rv: # type: ignore
+            rv.remove(propiedad.id) # type: ignore
+        rv.insert(0, int(propiedad.id)) # type: ignore
+        # Cap a 20
+        request.session['recently_viewed'] = rv[:20]
+        request.session.modified = True
+    except Exception:
+        pass
     # Siempre renderiza el mismo template (que ya está diseñado como modal)
     return render(request, "properties/detalle_propiedad.html", {"propiedad": propiedad})
 
