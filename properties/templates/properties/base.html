@@ -67,7 +67,7 @@
     <a href="{% url 'profile' %}" class="text-decoration-none text-dark">Profile</a>
     <a href="{% url 'favorites' %}" class="text-decoration-none text-dark">Favorites</a>
     {% if user.is_authenticated %}
-      {% if user.is_staff %}
+      {% if user.is_admin %}
         <a href="{% url 'admin_dashboard' %}" class="text-decoration-none text-dark">Dashboard Admin</a>
       {% elif user.profile.is_owner %}
         <a href="{% url 'owner_dashboard' %}" class="text-decoration-none text-dark">Dashboard Owner</a>

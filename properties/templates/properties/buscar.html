@@ -20,7 +20,7 @@
       {% include "properties/partials/property_card.html" %}
     {% empty %}
       <p class="text-center">We couldn´t find any properties</p>
-      <a class="btn btn-success align-self-center" href="{% url 'home' %}">Back to home</a>
+      <a class="btn btn-success" style="width: 200px; align-self: center;" href="{% url 'home' %}">Back to home</a>
     {% endfor %}
   </div>
 
