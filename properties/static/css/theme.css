@@ -1,0 +1,156 @@
+/*
+	Global theme overrides: unified brown (cafecito) buttons and typography tweaks.
+	Loaded after Bootstrap and local styles.
+*/
+
+:root {
+	--brand-brown: #444444;         /* main brand (cafecito per request) */
+	--brand-brown-600: #333333;     /* hover */
+	--brand-brown-700: #222222;     /* active */
+	--brand-brown-contrast: #ffffff;
+	--brand-focus-ring: rgba(68, 68, 68, 0.35);
+}
+
+/* Typography: ensure Inter everywhere (already set in main.css, this is a safety net) */
+html, body {
+	font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+/*
+	Button unification: make every Bootstrap variant brown except danger.
+	This will cover .btn, .btn-primary/.secondary/.success/.info/.warning/.dark and their outline variants.
+*/
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-success,
+.btn-info,
+.btn-warning,
+.btn-dark {
+	background-color: var(--brand-brown) !important;
+	border-color: var(--brand-brown) !important;
+	color: var(--brand-brown-contrast) !important;
+}
+
+.btn:hover,
+.btn-primary:hover,
+.btn-secondary:hover,
+.btn-success:hover,
+.btn-info:hover,
+.btn-warning:hover,
+.btn-dark:hover {
+	background-color: var(--brand-brown-600) !important;
+	border-color: var(--brand-brown-600) !important;
+	color: var(--brand-brown-contrast) !important;
+}
+
+.btn:active,
+.btn-primary:active,
+.btn-secondary:active,
+.btn-success:active,
+.btn-info:active,
+.btn-warning:active,
+.btn-dark:active {
+	background-color: var(--brand-brown-700) !important;
+	border-color: var(--brand-brown-700) !important;
+	color: var(--brand-brown-contrast) !important;
+}
+
+.btn:focus,
+.btn-primary:focus,
+.btn-secondary:focus,
+.btn-success:focus,
+.btn-info:focus,
+.btn-warning:focus,
+.btn-dark:focus {
+	box-shadow: 0 0 0 .25rem var(--brand-focus-ring) !important;
+}
+
+/* Note: We intentionally do not override .btn-danger/.btn-outline-danger to preserve destructive semantics. */
+
+/* Outline variants: unify to brown */
+.btn-outline-primary,
+.btn-outline-secondary,
+.btn-outline-success,
+.btn-outline-info,
+.btn-outline-warning,
+.btn-outline-dark {
+	color: var(--brand-brown) !important;
+	border-color: var(--brand-brown) !important;
+	background-color: transparent !important;
+}
+.btn-outline-primary:hover,
+.btn-outline-secondary:hover,
+.btn-outline-success:hover,
+.btn-outline-info:hover,
+.btn-outline-warning:hover,
+.btn-outline-dark:hover {
+	background-color: var(--brand-brown) !important;
+	color: var(--brand-brown-contrast) !important;
+}
+
+/* Link buttons: keep link look but align color when not explicitly text-dark */
+.btn-link:not(.text-dark) {
+	color: var(--brand-brown) !important;
+}
+/* Ensure link-styled buttons with text-dark also use the brand color */
+.btn-link.text-dark {
+	color: var(--brand-brown) !important;
+}
+/* Header specific icon/links (hamburguesa y personita) */
+header .btn-link, header .btn-link i {
+	color: var(--brand-brown) !important;
+}
+
+/* Pagination theming */
+.pagination .page-link {
+	color: var(--brand-brown);
+}
+.pagination .page-item.active .page-link {
+	background-color: var(--brand-brown);
+	border-color: var(--brand-brown);
+	color: var(--brand-brown-contrast);
+}
+.pagination .page-link:focus {
+	box-shadow: 0 0 0 .2rem var(--brand-focus-ring);
+}
+
+/* ===== Auth pages background ===== */
+.auth-bg {
+	min-height: 100vh;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	display: flex;
+	align-items: center;
+}
+.auth-bg .card {
+	background: rgba(255, 255, 255, 0.92);
+	backdrop-filter: saturate(140%) blur(4px);
+}
+
+/* Body-level full background for auth pages */
+.auth-bg-page {
+	min-height: 100vh;
+	background-image: url('/static/images/centromedellin.jpg');
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+/* --- Exception: favorite (heart) button must remain transparent --- */
+.toggle-favorite,
+.toggle-favorite.btn,
+.toggle-favorite.btn-link {
+	background-color: transparent !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
+}
+.toggle-favorite:hover,
+.toggle-favorite:focus,
+.toggle-favorite:active {
+	background-color: transparent !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
+}
+

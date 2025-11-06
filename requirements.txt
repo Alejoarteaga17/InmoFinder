@@ -1,2 +1,6 @@
 django
 Pillow
+os
+numpy
+joblib
+scikit-learn sentence-transformers tqdm pandas numpy

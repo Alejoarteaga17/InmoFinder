@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
-from django.db.models import Q, Prefetch
+from django.db.models import Q, Prefetch, Case, When, IntegerField
 from .models import Propiedad, MediaPropiedad
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -14,6 +14,11 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import JsonResponse
 from .models import Favorite, Propiedad
+try:
+    # Importar la búsqueda por embeddings (carga el modelo una sola vez por proceso)
+    from properties.management.commands.embeddings import buscar_propiedades as emb_buscar
+except Exception:
+    emb_buscar = None  # fallback si no está disponible
 
 
 def home(request):
@@ -37,10 +42,38 @@ def home(request):
     favorite_ids = []
     if request.user.is_authenticated:
         favorite_ids = list(Favorite.objects.filter(user=request.user).values_list('propiedad_id', flat=True))
-    
+
+    # -- Propiedades vistas recientemente (sesión) --
+    recent_ids = request.session.get('recently_viewed', [])
+    recent_props = []
+    if recent_ids:
+        # Tomar máximo 4, preservar orden
+        top_ids = list(recent_ids)[:4]
+        when_list = [When(id=pk, then=pos) for pos, pk in enumerate(top_ids)]
+        recent_qs = (
+            Propiedad.objects.filter(id__in=top_ids)
+            .prefetch_related(media_prefetch)
+            .order_by(Case(*when_list, output_field=IntegerField()))
+        )
+        # Agregar portada a cada propiedad reciente
+        tmp = []
+        for propiedad in recent_qs:
+            portada = None
+            for media in propiedad.media.all(): # type: ignore
+                if media.archivo:
+                    portada = media.archivo.url
+                    break
+                elif media.url:
+                    portada = media.url
+                    break
+            propiedad.portada = portada # type: ignore
+            tmp.append(propiedad)
+        recent_props = tmp
+
     return render(request, "properties/home.html", {
         "propiedades": qs,
-        "favorite_ids": favorite_ids
+        "favorite_ids": favorite_ids,
+        "recent_props": recent_props,
     })
 
 @login_required
@@ -203,6 +236,19 @@ class PropiedadDeleteView(LoginRequiredMixin, PropietarioRequiredMixin, RoleSucc
 # --- DETALLE DE PROPIEDAD ---
 def detalle_propiedad(request, propiedad_id):
     propiedad = get_object_or_404(Propiedad, id=propiedad_id)
+    # Registrar en sesión como recientemente vista (LRU simple)
+    try:
+        rv = request.session.get('recently_viewed', [])
+        # Normalizar a ints y deduplicar moviendo al frente
+        rv = [int(x) for x in rv if x is not None]
+        if propiedad.id in rv: # type: ignore
+            rv.remove(propiedad.id) # type: ignore
+        rv.insert(0, int(propiedad.id)) # type: ignore
+        # Cap a 20
+        request.session['recently_viewed'] = rv[:20]
+        request.session.modified = True
+    except Exception:
+        pass
     # Siempre renderiza el mismo template (que ya está diseñado como modal)
     return render(request, "properties/detalle_propiedad.html", {"propiedad": propiedad})
 
@@ -262,14 +308,32 @@ def contact_owner(request, propiedad_id):
 def buscar_propiedades(request):
     propiedades = Propiedad.objects.all()
 
-    # Texto libre (map to new fields)
+    # Texto libre: usar embeddings si hay consulta y el motor está disponible; si falla, usar icontains
     search = request.GET.get("search")
+    ids_ranked = []
+    used_embeddings = False
     if search:
-        propiedades = propiedades.filter(
-            Q(title__icontains=search) |
-            Q(description__icontains=search) |
-            Q(location__icontains=search)
-        )
+        if emb_buscar is not None:
+            try:
+                # Obtener un conjunto razonable de candidatos para luego aplicar filtros
+                results = emb_buscar(search, top_k=500)
+                ids_ranked = [r.get("id") for r in results if r.get("id")]
+                if ids_ranked:
+                    propiedades = propiedades.filter(id__in=ids_ranked)
+                    used_embeddings = True
+            except Exception:
+                # Fallback a búsqueda simple
+                propiedades = propiedades.filter(
+                    Q(title__icontains=search) |
+                    Q(description__icontains=search) |
+                    Q(location__icontains=search)
+                )
+        else:
+            propiedades = propiedades.filter(
+                Q(title__icontains=search) |
+                Q(description__icontains=search) |
+                Q(location__icontains=search)
+            )
 
     # Filtros numéricos (map names)
     precio_min = request.GET.get("precio_min")
@@ -307,7 +371,7 @@ def buscar_propiedades(request):
     if request.GET.get("mascotas") == "1":
         propiedades = propiedades.filter(pets_allowed=True)
 
-    # Orden
+    # Orden: si usamos embeddings y no se especifica otro orden, preservamos ranking por similitud
     orden = request.GET.get("orden")
     mapping = {
         "precio_asc": "price_cop",
@@ -318,6 +382,10 @@ def buscar_propiedades(request):
     }
     if orden in mapping:
         propiedades = propiedades.order_by(mapping[orden])
+    elif used_embeddings and ids_ranked:
+        # Preservar el orden de ids_ranked
+        when_list = [When(id=pk, then=pos) for pos, pk in enumerate(ids_ranked)]
+        propiedades = propiedades.order_by(Case(*when_list, output_field=IntegerField()))
 
     # Prefetch media + paginación
     media_prefetch = Prefetch('media', queryset=MediaPropiedad.objects.all())
@@ -344,9 +412,15 @@ def buscar_propiedades(request):
     if request.user.is_authenticated:
         favorite_ids = list(Favorite.objects.filter(user=request.user).values_list('propiedad_id', flat=True))
 
+    # Build querystring without page for clean pagination links
+    params = request.GET.copy()
+    params.pop('page', None)
+    querystring = params.urlencode()
+
     return render(request, "properties/buscar.html", {
         "propiedades": page_obj,
-        "favorite_ids": favorite_ids
+        "favorite_ids": favorite_ids,
+        "querystring": querystring,
     })
 
 @login_required

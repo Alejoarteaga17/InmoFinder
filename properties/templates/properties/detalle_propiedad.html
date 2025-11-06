@@ -1,9 +1,9 @@
 {% load static %}
 {% load humanize %}
-
-<div class="modal-header">
-    <h5 class="modal-title">{{ propiedad.title }}</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+<div class="modal-header justify-content-center position-relative">
+    <h5 class="modal-title text-center">{{ propiedad.title }}</h5>
+    <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
 </div>
 
 <div class="modal-body detalle-propiedad">
@@ -44,14 +44,16 @@
 
     <!-- Información de la propiedad -->
     <div class="info-propiedad">
-        <p class="fw-bold text-success">Precio Total: $ {{ propiedad.price_cop|intcomma }} COP</p>
+        <p class="fw-bold text-ink">Precio Total: $ {{ propiedad.price_cop|intcomma }} COP</p>
         <p>
             <span class="price-m2-badge">
-                ${{ propiedad.price_m2|intcomma }} COP/m²
+                {% if propiedad.price_m2 %}
+                    ${{ propiedad.price_m2_display|intcomma }} COP/m²
+                {% else %}
+                    <small class="text-muted">Precio por m² no disponible</small>
+                {% endif %}
             </span>
         </p>
-
-        <p class="text-muted">📍 {{ propiedad.location }}</p>
 
         <ul class="list-unstyled small">
             <li><b>Área:</b> {{ propiedad.area_m2 }} m²</li>
@@ -66,22 +68,49 @@
         <li><b>Amenities:</b> {% if propiedad.amenities %}{{ propiedad.amenities|join:", " }}{% else %}No amenities available{% endif %}</li>
         </ul>
 
-    <h6>Description</h6>
-    <p>{{ propiedad.description }}</p>
+        <h6>Description</h6>
+        <p>{{ propiedad.description }}</p>
+    </div>   
+
+        {# === Mapa de Google (embed sin costo ni API key) === #}
+    {% if propiedad.location %}
+    <div class="mt-3">
+        <p class="text-muted">📍 {{ propiedad.location }}</p>
+        <div class="ratio ratio-16x9 border rounded overflow-hidden">
+            <iframe
+                    src="https://www.google.com/maps?q={{ propiedad.location|urlencode }}&output=embed"
+                    style="border:0;"
+                    allowfullscreen
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="Mapa de {{ propiedad.title|default:'propiedad' }}">
+
+            </iframe>
+        </div>
+
+        <p class="small text-muted mt-2">
+            Puedes mover y hacer zoom en el mapa para ver la ubicación con más detalle.
+        </p>
     </div>
 
-<div class="interes mt-4 text-center">
-    <h6>Interested?</h6>
-    {% if user.is_authenticated %}
-    <button class="btn btn-dark mt-2" 
-        id="openContactBtn" 
-        data-url="{% url 'contact_form' propiedad.id %}">
-    Contact
-</button>
-    {% else %}
-        <a href="{% url 'login' %}?next={% url 'detalle_propiedad' propiedad.id %}?modal=1">Contact owner</a>
+        {% else %}
+        <div class="alert alert-warning mt-3 mb-0" role="alert">
+            No se ha podido <b>generar</b> el mapa porque la propiedad no tiene una dirección disponible.
+        </div>
+        {% endif %}
+
+    <div class="interes  text-center">
+        <h6>Interested?</h6>
+        {% if user.is_authenticated %}
+        <button class="btn btn-success btn-pill d-block mx-auto"
+                id="openContactBtn"
+                data-url="{% url 'contact_form' propiedad.id %}">Contact
+        </button>
+
+        {% else %}
+        <a href="{% url 'login' %}?next={% url 'detalle_propiedad' propiedad.id %}?modal=1" class="btn btn-success btn-pill d-block mx-auto">Contact owner</a>
         <p class="small text-muted mt-2">You need an account to contact the owner.</p>
-    {% endif %}
+        {% endif %}
+    </div>
+
 </div>
-
-

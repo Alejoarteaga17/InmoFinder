@@ -48,3 +48,39 @@ class LoginForm(AuthenticationForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Password"})
     )
+
+
+class UserUpdateForm(forms.ModelForm):
+    """Formulario para editar información básica del usuario."""
+    class Meta:
+        model = Usuario
+        fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "phone",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Estilos Bootstrap
+        for name, field in self.fields.items():
+            css = field.widget.attrs.get("class", "")
+            field.widget.attrs["class"] = (css + " form-control").strip()
+        self.fields["username"].widget.attrs.setdefault("placeholder", "Username")
+        self.fields["email"].widget.attrs.setdefault("placeholder", "Email")
+        self.fields["first_name"].widget.attrs.setdefault("placeholder", "First name")
+        self.fields["last_name"].widget.attrs.setdefault("placeholder", "Last name")
+        self.fields["phone"].widget.attrs.setdefault("placeholder", "Phone")
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if not email:
+            return email
+        qs = Usuario.objects.filter(email=email)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError("This email is already in use.")
+        return email
