@@ -1,3 +1,14 @@
+/* Checkbox style for filters - normal shape with brand color */
+.circle-check.form-check-input {
+  cursor: pointer;
+  margin-right: 0.65rem; /* espacio entre checkbox y label */
+}
+
+.circle-check.form-check-input:checked {
+  background-color: var(--brand-brown, #444444);
+  border-color: var(--brand-brown, #444444);
+}
+
 :root {
   --ink: #444444;          /* texto fuerte + btn SIGN UP */
   --muted: #A8ADB1;        /* “InmoFinder” (gris), párrafo, lupa */
@@ -128,7 +139,6 @@ header {
 .filters {
   padding: .8rem 1.5rem;
   border-radius: 25px;
-  background-color: #d4d0d05b;
 }
 
 .btn-filter {
@@ -153,23 +163,30 @@ header {
   box-shadow: 0 6px 12px rgba(0,0,0,0.15);
   border-color: var(--muted);
 }
-.form-check-input {
-  padding: auto;
-  width: .2rem;
-  height: .2rem;
-  border-radius: 50%;
-  border: 2px solid var(--muted);
-  background-color: #fff;
-  transition: all 0.2s ease;
-}
+
 .form-check-input:checked {
   background-color: var(--brand-brown, var(--ink));
   border-color: var(--brand-brown, var(--ink));
 }
 
+/* Fuerza estilo nativo y redondo para radios (sin tocar tamaños ni radius numéricos) */
+.form-check-input[type="radio"] {
+  -webkit-appearance: radio;
+  appearance: auto;
+  transform: scale(1.35);         /* aumenta tamaño visual */
+  transform-origin: center;
+  margin-right: .35rem;           /* espacio con el label */
+  vertical-align: middle;
+}
+
+/* Acerca el filtro de Pets al de Garage sin mover Garage */
+.filter-tight-left {
+  margin-left: -0.5rem;
+}
+
 /* Alineación común buscador + chips + filtros */
 .alineado-filtros {
-  margin-left: .5rem;  /* 👈 ajusta este valor hasta que quede alineado */
+  margin-left: .5rem;  /* Ajusta este valor hasta que quede alineado */
 }
 
 /* Chips */

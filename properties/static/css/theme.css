@@ -118,24 +118,18 @@ header .btn-link, header .btn-link i {
 /* ===== Auth pages background ===== */
 .auth-bg {
 	min-height: 100vh;
-	background-size: cover;
-	background-position: center;
-	background-repeat: no-repeat;
+	background: #f5f3f3; /* same as homepage */
 	display: flex;
 	align-items: center;
 }
 .auth-bg .card {
-	background: rgba(255, 255, 255, 0.92);
-	backdrop-filter: saturate(140%) blur(4px);
+	background: rgba(255, 255, 255, 0.95);
 }
 
 /* Body-level full background for auth pages */
 .auth-bg-page {
 	min-height: 100vh;
-	background-image: url('/static/images/centromedellin.jpg');
-	background-size: cover;
-	background-position: center;
-	background-repeat: no-repeat;
+	background: #f5f3f3; /* same as homepage */
 }
 
 /* --- Exception: favorite (heart) button must remain transparent --- */

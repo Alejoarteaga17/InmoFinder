@@ -122,6 +122,14 @@ def favorites_list(request):
         'favorite_ids': favorite_ids
 })
 
+@login_required
+def clear_favorites(request):
+    """Remove all favorites for the current user"""
+    if request.method == 'POST':
+        Favorite.objects.filter(user=request.user).delete()
+        messages.success(request, 'All favorites have been cleared successfully.')
+    return redirect('favorites')
+
 
 class ChangePasswordView(PasswordChangeView):
     template_name = "users/change_password.html"

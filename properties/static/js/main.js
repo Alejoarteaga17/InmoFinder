@@ -58,6 +58,48 @@ function getCookie(name) {
   return null;
 }
 
+// Allow unchecking radios with class .allow-uncheck (handles label clicks and touch)
+function getRelatedAllowUncheck(target) {
+  // Direct radio
+  let r = target.closest && target.closest('.allow-uncheck[type="radio"]');
+  if (r) return r;
+  // Label next to radio input
+  if (target.classList && target.classList.contains('form-check-label')) {
+    const sib = target.previousElementSibling;
+    if (sib && sib.matches && sib.matches('.allow-uncheck[type="radio"]')) return sib;
+  }
+  return null;
+}
+
+// Use pointerdown to catch both mouse and touch
+document.addEventListener(
+  "pointerdown",
+  function (e) {
+    const r = getRelatedAllowUncheck(e.target);
+    if (r) {
+      r.dataset.waschecked = r.checked ? "true" : "false";
+    }
+  },
+  true
+);
+
+document.addEventListener(
+  "click",
+  function (e) {
+    const r = getRelatedAllowUncheck(e.target);
+    if (r && r.dataset.waschecked === "true") {
+      // If it was already checked, uncheck on click
+      r.checked = false;
+      r.removeAttribute("data-waschecked");
+      // Prevent default selection
+      e.preventDefault();
+      // Notify listeners of change
+      r.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  },
+  true
+);
+
 // Delegated click handler (single listener, avoids null refs)
 document.addEventListener("click", function (e) {
   // 1) Toggle favorite
@@ -106,12 +148,15 @@ document.addEventListener("click", function (e) {
         }
         const icon = favBtn.querySelector("i") || favBtn;
         if (!icon) return;
+        // Remove any mutually-exclusive color classes that could override the red color
+        icon.classList.remove("text-dark", "text-muted", "text-secondary");
         if (data.status === "added") {
           icon.classList.remove("bi-heart");
           icon.classList.add("bi-heart-fill", "text-danger");
         } else {
           icon.classList.remove("bi-heart-fill", "text-danger");
-          icon.classList.add("bi-heart");
+          // Add a sensible default color for the unliked state
+          icon.classList.add("bi-heart", "text-dark");
         }
       })
       .catch((err) => console.error("Error toggling favorite:", err));
