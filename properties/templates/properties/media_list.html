@@ -85,7 +85,12 @@
 <body>
   <div class="container">
     <div class="top-nav">
-      <a href="/properties/dashboard/" class="btn">← Back to Dashboard</a>
+      {% if user.is_admin %}
+        <a href="{% url 'admin_dashboard' %}" class="btn">← Back to Dashboard</a>
+      {% else %}
+        <a href="{% url 'dashboard' %}" class="btn">← Back to Dashboard</a>
+      {% endif %}
+
     </div>
 
     <h1>Media for "{{ propiedad.title }}"</h1>
