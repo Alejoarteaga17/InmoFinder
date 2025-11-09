@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.db.models import Q, Prefetch, Case, When, IntegerField
@@ -10,6 +11,7 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
 from django.urls import reverse_lazy
+import logging
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import JsonResponse
@@ -279,7 +281,13 @@ def contact_owner(request, propiedad_id):
 
     if not form.is_valid():
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
-            return JsonResponse({"success": False, "errors": form.errors})
+            # Devolver mensaje legible además de los errores de campo para que
+            # el frontend pueda mostrarlos fácilmente.
+            return JsonResponse({
+                "success": False,
+                "message": "Por favor corrige los errores del formulario.",
+                "errors": form.errors,
+            }, status=400)
         messages.error(request, "Por favor corrige los errores del formulario.")
         return redirect("detalle_propiedad", propiedad_id=propiedad_id)
 
@@ -292,17 +300,49 @@ def contact_owner(request, propiedad_id):
     owner = propiedad.owner
     if owner and owner.email:
         subject = f"Nuevo mensaje sobre tu propiedad «{propiedad.title}»"
-        context = {"propiedad": propiedad, "mensaje": contact.mensaje, "remitente": contact.nombre, "email": contact.email}
+        # Build context keys expected by the email template
+        context = {
+            "propiedad": propiedad,
+            "sender_name": contact.nombre,
+            "sender_email": contact.email,
+            "message": contact.mensaje,
+            "site": request.get_host(),
+        }
         body_html = render_to_string("properties/partials/contact_owner.html", context)
-        email = EmailMessage(subject, body_html, to=[owner.email])
+        # Use DEFAULT_FROM_EMAIL as From address (safer) and set reply-to to sender
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None) or None
+        email = EmailMessage(subject, body_html, from_email, [owner.email], reply_to=[contact.email])
+        # Intenta incluir el nombre y correo del remitente en la cabecera From
+        # Nota: algunos proveedores SMTP pueden sobrescribir o rechazar headers From
+        # que no coincidan con la cuenta usada para autenticar el envío.
+        try:
+            email.extra_headers = {'From': f'{contact.nombre} <{contact.email}>'}
+        except Exception:
+            # No crítico: continuar sin extra headers si algo falla
+            pass
         email.content_subtype = "html"
+        email_sent = True
         try:
             email.send()
         except Exception:
-            pass
+            email_sent = False
+            # Log exception to the server console so we can debug SMTP/auth issues
+            logging.exception("Error sending contact email for propiedad id %s", propiedad_id)
 
-    messages.success(request, "📨 Tu mensaje fue enviado al propietario.")
-    return redirect("home")
+        # Responder apropiadamente según si la petición fue AJAX
+        success_message = "📨 Tu mensaje fue enviado al propietario."
+        messages.success(request, success_message)
+
+        # If email wasn't sent, add a warning for regular requests and include a flag in AJAX
+        if not email_sent:
+            warning_msg = "⚠️ No se pudo enviar el email al propietario (problema con el servidor de correo)."
+            # Mostrar advertencia en mensajes para solicitudes normales
+            messages.warning(request, warning_msg)
+
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({"success": True, "message": success_message, "email_sent": email_sent})
+
+        return redirect("home")
 
 
 def buscar_propiedades(request):

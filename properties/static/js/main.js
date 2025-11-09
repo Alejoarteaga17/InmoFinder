@@ -257,7 +257,24 @@ document.addEventListener("submit", function (e) {
         if (msgEl) {
           msgEl.classList.remove("d-none", "alert-success");
           msgEl.classList.add("alert-danger");
-          msgEl.innerHTML = data.message || 'Error al enviar el mensaje.';
+          // Si el servidor envió errores de campos, formatearlos
+          if (data.errors) {
+            let html = `<strong>${(data.message && data.message) || 'Errores en el formulario:'}</strong><ul class="mb-0">`;
+            try {
+              // data.errors puede venir como objeto con listas
+              for (const [field, errs] of Object.entries(data.errors)) {
+                const fieldLabel = field === '__all__' ? '' : `<em>${field}:</em> `;
+                const messages = Array.isArray(errs) ? errs : [errs];
+                messages.forEach(m => { html += `<li>${fieldLabel}${m}</li>` });
+              }
+            } catch (e) {
+              html += `<li>${data.message || 'Error al enviar el mensaje.'}</li>`;
+            }
+            html += `</ul>`;
+            msgEl.innerHTML = html;
+          } else {
+            msgEl.innerHTML = data.message || 'Error al enviar el mensaje.';
+          }
         }
       }
     })

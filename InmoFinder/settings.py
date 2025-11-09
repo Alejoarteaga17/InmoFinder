@@ -11,6 +11,40 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+import io
+import sys
+
+# ---------------------------------------------------------------------------
+# Cargar variables desde un archivo .env en la raíz del proyecto (opcional)
+# Esto hace más sencillo usar un archivo .env durante el desarrollo sin
+# requerir dependencias externas como python-dotenv.
+def _load_dotenv(path):
+    try:
+        if not path.exists():
+            return
+        with path.open('r', encoding='utf-8') as f:
+            for raw in f:
+                line = raw.strip()
+                if not line or line.startswith('#'):
+                    continue
+                if '=' not in line:
+                    continue
+                key, _, val = line.partition('=')
+                key = key.strip()
+                val = val.strip().strip('"').strip("'")
+                # If variable not already set in environment, set it
+                if key and key not in os.environ:
+                    os.environ[key] = val
+    except Exception:
+        # No crítico: si falla la carga, seguimos sin interrumpir el proceso
+        print(f"Warning: could not load .env from {path}", file=sys.stderr)
+
+# Intentar cargar .env (archivo en la raíz del proyecto)
+_load_dotenv(Path(__file__).resolve().parent.parent / '.env')
+# También respetar un archivo sendgrid.env si el usuario lo emplea
+_load_dotenv(Path(__file__).resolve().parent.parent / 'sendgrid.env')
+# ---------------------------------------------------------------------------
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -117,19 +151,39 @@ MEDIA_ROOT = BASE_DIR / "media"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 LOGIN_URL = "login"                # Si alguien intenta entrar a una vista protegida, lo manda al login
 LOGIN_REDIRECT_URL = "/properties/role-redirect/"        # Después de iniciar sesión, lo manda al home
 LOGOUT_REDIRECT_URL = "home"       # Después de hacer logout, lo manda al home
 AUTH_USER_MODEL = "users.Usuario"  # Nuestro modelo de usuario personalizado
-EMAIL_BACKEND = "django.users.mail.backends.console.EmailBackend"
-DEFAULT_FROM_EMAIL = 'alejoarte123@gmail.com'
-'''
-EMAIL_BACKEND = "django.Usuarios.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.example.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
-'''
+
+# Email configuration
+# If EMAIL_HOST_USER and EMAIL_HOST_PASSWORD are present in the environment,
+# prefer using SMTP (so you can send real emails). Otherwise, when DEBUG is True
+# fall back to the console backend for safe local testing.
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+
+if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    # Use SMTP backend when credentials are provided (e.g. via .env)
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
+    EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
+    EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") in ["True", "true", "1"]
+    DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
+else:
+    # No SMTP credentials: use console backend when debugging to avoid network errors
+    if DEBUG:
+        EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+        DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "webmaster@localhost")
+    else:
+        # In production without credentials we still use console backend to avoid crashes,
+        # but you should provide SMTP credentials via environment variables.
+        EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+        DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "webmaster@localhost")
+
+# Quick alternative for local debugging: if you run MailHog locally set:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'localhost'
+# EMAIL_PORT = 1025
+# EMAIL_USE_TLS = False
+
