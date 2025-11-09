@@ -52,14 +52,14 @@
         </select>
     </div>
     <div class="col-md-2 form-check height-100 d-flex align-items-center">
-        <input type="checkbox" class="form-check-input" name="garaje" value="1"
+        <input type="checkbox" id="filter-garaje" class="form-check-input circle-check" name="garaje" value="1"
                 {% if request.GET.garaje == "1" %}checked{% endif %}>
-        <label class="form-check-label" > Garage</label>
+        <label class="form-check-label" for="filter-garaje"> Garage</label>
     </div>
-    <div class="col-md-2 form-check height-100 d-flex align-items-center">
-        <input type="checkbox" class="form-check-input" name="mascotas" value="1"
+    <div class="col-md-2 form-check height-100 d-flex align-items-center filter-tight-left">
+        <input type="checkbox" id="filter-mascotas" class="form-check-input circle-check" name="mascotas" value="1"
                 {% if request.GET.mascotas == "1" %}checked{% endif %}>
-        <label class="form-check-label"> Pets</label>
+        <label class="form-check-label" for="filter-mascotas"> Pets</label>
     </div>
 
     <div class="col-12 d-flex justify-content-end">

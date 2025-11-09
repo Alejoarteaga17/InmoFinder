@@ -10,6 +10,7 @@ urlpatterns = [
     path("profile/edit/", views.edit_profile, name="edit_profile"),
     path("profile/password/", views.ChangePasswordView.as_view(), name="change_password"),
     path("favorites/", views.favorites_list, name="favorites"),
+    path("favorites/clear/", views.clear_favorites, name="clear_favorites"),
 
 
 ]
