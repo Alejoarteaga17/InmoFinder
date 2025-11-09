@@ -114,7 +114,7 @@
             {% else %}
               <img src="{{ m.media_url }}" alt="Image">
             {% endif %}
-            <p class="muted">{{ m.tipo|title }} · {{ m.created_at|date:"Y-m-d H:i" }}</p>
+            <p class="muted">{{ m.tipo|title }}</p>
             <form method="post" action="{% url 'media_delete' propiedad.id m.id %}">
               {% csrf_token %}
               <button type="submit" class="btn btn-danger">Delete</button>
