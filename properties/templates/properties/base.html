@@ -69,7 +69,7 @@
     {% if user.is_authenticated %}
       {% if user.is_admin %}
         <a href="{% url 'admin_dashboard' %}" class="text-decoration-none text-dark">Dashboard Admin</a>
-      {% elif user.profile.is_propietario %}
+      {% elif user.is_propietario %}
         <a href="{% url 'dashboard' %}" class="text-decoration-none text-dark">Dashboard Owner</a>
       {% endif %}
       <a href="{% url 'logout' %}" class="text-decoration-none" style="color: #cc0000">Log Out</a>
