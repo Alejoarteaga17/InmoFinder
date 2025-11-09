@@ -118,7 +118,6 @@ header .btn-link, header .btn-link i {
 /* ===== Auth pages background ===== */
 .auth-bg {
 	min-height: 100vh;
-	background: #f5f3f3; /* same as homepage */
 	display: flex;
 	align-items: center;
 }
@@ -129,7 +128,46 @@ header .btn-link, header .btn-link i {
 /* Body-level full background for auth pages */
 .auth-bg-page {
 	min-height: 100vh;
-	background: #f5f3f3; /* same as homepage */
+	/* Background image for auth pages (login/register) */
+	background: #f5f3f3 url("../images/centromedellin.jpg") no-repeat center center fixed;
+	background-size: cover;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+}
+
+/* Password visibility toggle inside inputs */
+.password-toggle {
+	position: relative;
+}
+.password-toggle input[type="password"],
+.password-toggle input[type="text"] {
+	padding-right: 3.25rem; /* space for the button */
+}
+.password-toggle .toggle-password {
+	position: absolute;
+	right: 0.5rem;
+	top: 50%;
+	transform: translateY(-50%);
+	border: none;
+	background: transparent;
+	padding: 0.25rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--brand-brown);
+	cursor: pointer;
+	width: 2rem;
+	height: 2rem;
+}
+.password-toggle .toggle-password:focus {
+	outline: none;
+	box-shadow: 0 0 0 .15rem var(--brand-focus-ring);
+	border-radius: .25rem;
+}
+.password-toggle .toggle-password svg {
+	width: 1.25rem;
+	height: 1.25rem;
 }
 
 /* --- Exception: favorite (heart) button must remain transparent --- */
