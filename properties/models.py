@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from mimetypes import guess_type
+
 
 
 User = get_user_model()
@@ -90,22 +93,94 @@ class Propiedad(models.Model):
 
 
 class MediaPropiedad(models.Model):
+
+    MAX_FILE_MB = 1000  # 1000 MB
+    ALLOWED_PREFIXES = ("image/", "video/")
+
     propiedad = models.ForeignKey(Propiedad, related_name='media', on_delete=models.CASCADE)
     archivo = models.FileField(upload_to='propiedades/', blank=True, null=True)
     tipo = models.CharField(max_length=10, choices=[('imagen', 'Imagen'), ('video', 'Video')], blank=True)
     url = models.URLField(blank=True, null=True)  # Para almacenar links de imágenes externas (como los del JSON)
 
+    # ------ Helpers internos ------
+    def _infer_mime_and_type(self):
+        """
+        Devuelve (mime, tipo_inferido) según archivo o url.
+        tipo_inferido en {'imagen', 'video'}.
+        """
+        # 1) Si viene desde request.FILES, suele traer content_type
+        content_type = ""
+        if self.archivo and hasattr(self.archivo, "file"):
+            content_type = getattr(self.archivo, "content_type", "") or ""
+
+        # 2) Si no, intenta por nombre/ruta
+        candidate = ""
+        if not content_type:
+            if self.archivo:
+                candidate = getattr(self.archivo, "name", "") or ""
+            elif self.url:
+                candidate = self.url or ""
+            mime, _ = guess_type(candidate)
+        else:
+            mime = content_type
+
+        if not mime:
+            # fallback por extensión
+            lower = (candidate or "").lower()
+            if lower.endswith((".mp4", ".mov", ".avi", ".webm", ".mkv")):
+                return ("video/mp4", "video")
+            # por defecto lo tratamos como imagen
+            return ("image/jpeg", "imagen")
+
+        tipo_inferido = "video" if mime.startswith("video/") else "imagen"
+        return (mime, tipo_inferido)
+
+    # ------ Validaciones ------
+    def clean(self):
+        # Al menos uno: archivo o url
+        if not self.archivo and not self.url:
+            raise ValidationError("Provide a file or an external URL.")
+
+        # Si viene archivo, validar tamaño y tipo
+        if self.archivo:
+            size = getattr(self.archivo, "size", None)
+            if size is not None and size > self.MAX_FILE_MB * 1024 * 1024:
+                raise ValidationError(f"File exceeds {self.MAX_FILE_MB} MB.")
+
+            ctype = getattr(self.archivo, "content_type", "") or ""
+            if ctype and not any(ctype.startswith(p) for p in self.ALLOWED_PREFIXES):
+                raise ValidationError(f"Unsupported content type: {ctype}. Allowed: images/videos.")
+
+        # Si viene URL, inferir tipo por MIME/extensión
+        if self.url:
+            mime, tipo = self._infer_mime_and_type()
+            if not any(mime.startswith(p) for p in self.ALLOWED_PREFIXES):
+                raise ValidationError(f"Unsupported URL content type: {mime}. Allowed: images/videos.")
+
     def save(self, *args, **kwargs):
-        # Detecta el tipo automáticamente si no se pasa
-        if not self.tipo and self.url:
-            if any(self.url.lower().endswith(ext) for ext in ['.mp4', '.mov', '.avi']):
-                self.tipo = 'video'
-            else:
-                self.tipo = 'imagen'
+        # Ejecutar validaciones de modelo siempre
+        self.full_clean()
+
+        # Detectar tipo automáticamente si no se pasó
+        if not self.tipo:
+            # Inferir de archivo o url
+            _, tipo = self._infer_mime_and_type()
+            self.tipo = tipo or 'imagen'
+
         super().save(*args, **kwargs)
 
+    @property
+    def media_url(self) -> str:
+        """URL pública del recurso (archivo o remota)."""
+        if self.archivo:
+            try:
+                return self.archivo.url
+            except Exception:
+                return ""
+        return self.url or ""
+
     def __str__(self):
-        return f"Media de {self.propiedad.title} ({self.tipo})"
+        return f"Media de {self.propiedad.title or f'Propiedad {self.propiedad_id}'} ({self.tipo or '—'})"
 
 class ContactMessage(models.Model):
     propiedad = models.ForeignKey(
