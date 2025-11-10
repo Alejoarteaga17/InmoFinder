@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+  <body>
+    <p>Hola {{ user.get_full_name|default:user.username }},</p>
+    <p>Gracias por registrarte en InmoFinder. Antes de terminar la creación de tu cuenta, por favor confirma tu correo haciendo clic en el siguiente enlace:</p>
+    <p><a href="{{ confirm_url }}">Confirmar mi correo</a></p>
+    <p>Si el enlace no funciona, copia y pega esta URL en tu navegador:</p>
+    <p>{{ confirm_url }}</p>
+    <hr>
+    <p>Saludos,</p>
+    <p>InmoFinder</p>
+  </body>
+</html>
