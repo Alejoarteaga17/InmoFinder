@@ -50,6 +50,56 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+// Password visibility toggle: inject eye button into password inputs inside auth pages
+document.addEventListener("DOMContentLoaded", function () {
+  try {
+    const pwInputs = document.querySelectorAll('.auth-page input[type="password"]');
+    const eyeClosedSvg = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M2.47 2.47l19.06 19.06" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.53 9.53a3 3 0 004.24 4.24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 5c4.97 0 9 4.5 9 7s-4.03 7-9 7c-1.31 0-2.55-.25-3.67-.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const eyeOpenSvg = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+    pwInputs.forEach(function (input) {
+      if (input.dataset.toggleAttached) return; // avoid duplicates
+
+      // Create wrapper
+      const wrapper = document.createElement('div');
+      wrapper.className = 'password-toggle';
+
+      // Insert wrapper before input and move input inside
+      input.parentNode.insertBefore(wrapper, input);
+      wrapper.appendChild(input);
+
+      // Create toggle button
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toggle-password';
+      btn.setAttribute('aria-label', 'Mostrar contraseña');
+      btn.innerHTML = eyeClosedSvg;
+
+      // Append button to wrapper
+      wrapper.appendChild(btn);
+
+      // Mark attached
+      input.dataset.toggleAttached = '1';
+
+      // Click handler
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (input.type === 'password') {
+          input.type = 'text';
+          btn.innerHTML = eyeOpenSvg;
+          btn.setAttribute('aria-label', 'Ocultar contraseña');
+        } else {
+          input.type = 'password';
+          btn.innerHTML = eyeClosedSvg;
+          btn.setAttribute('aria-label', 'Mostrar contraseña');
+        }
+      });
+    });
+  } catch (err) {
+    console.error('Error initializing password toggles', err);
+  }
+});
+
 // Helper to get CSRF token
 function getCookie(name) {
   const value = `; ${document.cookie}`;
