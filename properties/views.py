@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST, require_http_methods
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 import logging
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -274,8 +274,36 @@ class PropiedadUpdateView(LoginRequiredMixin, PropietarioRequiredMixin, RoleSucc
                 if created:
                     messages.success(self.request, f"{created} archivo(s) subido(s).")
 
-        messages.success(self.request, "Propiedad actualizada correctamente")
-        return response
+            messages.success(self.request, "Propiedad actualizada correctamente")
+
+            # Enviar email al owner notificando que la propiedad fue actualizada
+            try:
+                owner = form.instance.owner
+                # Sólo enviar si el propietario tiene email
+                if owner and getattr(owner, 'email', None):
+                    subject = f"Detalles actualizados: {form.instance.title or 'tu propiedad'}"
+                    detail_url = self.request.build_absolute_uri(
+                        reverse('detalle_propiedad', args=[form.instance.id])
+                    )
+                    context = {
+                        'owner': owner,
+                        'propiedad': form.instance,
+                        'detail_url': detail_url,
+                    }
+                    body_html = render_to_string('properties/partials/property_updated_email.html', context)
+                    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None)
+                    email = EmailMessage(subject, body_html, from_email, [owner.email], reply_to=[from_email] if from_email else None)
+                    email.content_subtype = 'html'
+                    try:
+                        # En desarrollo puede imprimirse en consola según EMAIL_BACKEND
+                        email.send()
+                    except Exception:
+                        logging.exception('Error sending property-updated email for propiedad id %s', form.instance.id)
+            except Exception:
+                # No queremos que un error en el envío impida la actualización
+                logging.exception('Unexpected error while preparing property-updated email for propiedad id %s', form.instance.id)
+
+            return response
 
 
 class PropiedadDeleteView(LoginRequiredMixin, PropietarioRequiredMixin, RoleSuccessUrlMixin, DeleteView):
