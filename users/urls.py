@@ -6,6 +6,8 @@ urlpatterns = [
     path("login/", views.LoginView.as_view(), name="login"),
     path("logout/", views.logout_view, name="logout"),
     path("register/", views.RegisterView.as_view(), name="register"),
+    # Email confirmation link: uidb64 + token
+    path("confirm/<uidb64>/<token>/", views.confirm_email, name="confirm_email"),
     path("profile/", views.profile, name="profile"),
     path("profile/edit/", views.edit_profile, name="edit_profile"),
     path("profile/password/", views.ChangePasswordView.as_view(), name="change_password"),

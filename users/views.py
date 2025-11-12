@@ -7,6 +7,13 @@ from django.shortcuts import redirect
 from django.views.generic import FormView
 from properties.models import Favorite
 from django.contrib import messages
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.conf import settings
+from django.urls import reverse
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.contrib.auth.tokens import default_token_generator
 
 # Create your views here.
 
@@ -30,22 +37,63 @@ class RegisterView(FormView):
     form_class = RegisterForm
 
     def form_valid(self, form):
-        # Crear usuario
-        user = form.save()
-        # Autenticar y hacer login con las credenciales recién creadas
-        from django.contrib.auth import authenticate
-        email = form.cleaned_data.get("email")
-        password = form.cleaned_data.get("password1")
-        user_auth = authenticate(self.request, username=email, password=password)
-        if user_auth is not None:
-            login(self.request, user_auth)
-        else:
-            # Fallback en caso de que el backend no acepte authenticate con email directamente
-            try:
-                login(self.request, user, backend="django.contrib.auth.backends.ModelBackend")
-            except Exception:
-                pass
-        return redirect("home")
+        # Crear usuario pero desactivado hasta que confirme por email
+        user = form.save(commit=False)
+        user.is_active = False
+        # Roles por defecto
+        user.is_comprador = True
+        user.is_propietario = False
+        user.save()
+
+        # Enviar correo de activación con token
+        try:
+            subject = "Confirma tu correo en InmoFinder"
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            confirm_path = reverse('confirm_email', args=[uid, token])
+            confirm_url = self.request.build_absolute_uri(confirm_path)
+            context = {
+                'user': user,
+                'site': self.request.get_host(),
+                'confirm_url': confirm_url,
+            }
+            body_html = render_to_string('users/activation_email.html', context)
+            from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None)
+            email = EmailMessage(subject, body_html, from_email, [user.email])
+            email.content_subtype = 'html'
+            email.send()
+        except Exception:
+            import logging; logging.exception('Error sending activation email to %s', getattr(user, 'email', None))
+
+        # Informar al usuario que revise su correo
+        # Redirigimos a home por simplicidad; se puede crear una página específica si se desea.
+        messages.info(self.request, 'Hemos enviado un correo de confirmación. Revisa tu bandeja y sigue el enlace para activar tu cuenta.')
+        return redirect('home')
+
+
+def confirm_email(request, uidb64, token):
+    """Confirma el correo del usuario usando uidb64 y token. Si es válido, activa la cuenta y hace login."""
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        user = User.objects.get(pk=uid)
+    except Exception:
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        # Auto-login tras activación
+        try:
+            login(request, user)
+        except Exception:
+            pass
+        # Mostrar plantilla de activación completa
+        return render(request, 'users/activation_complete.html', {'user': user})
+    else:
+        # Token inválido o usuario no encontrado
+        return render(request, 'users/activation_invalid.html', status=400)
 
 REASONS = {
     "ADMIN_ONLY":        "Esta sección es solo para usuarios con rol Admin.",

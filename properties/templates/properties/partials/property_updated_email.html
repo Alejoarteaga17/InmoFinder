@@ -1,0 +1,12 @@
+<!doctype html>
+<html>
+  <body>
+    <p>Hola {{ owner.get_full_name|default:owner.username }},</p>
+    <p>Se han modificado correctamente los detalles de tu propiedad <strong>{{ propiedad.title }}</strong> ({{ propiedad.location }}).</p>
+    <p>Haz click en el siguiente enlace para ver los nuevos detalles:</p>
+    <p><a href="{{ detail_url }}">Ver detalles actualizados</a></p>
+    <hr>
+    <p>Saludos,</p>
+    <p>InmoFinder</p>
+  </body>
+</html>

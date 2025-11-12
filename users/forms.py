@@ -30,6 +30,15 @@ class RegisterForm(UserCreationForm):
             raise forms.ValidationError("This email is already registered.")
         return email
 
+    def clean_phone(self):
+        phone = self.cleaned_data.get("phone", "")
+        if phone:
+            if not phone.isdigit():
+                raise forms.ValidationError("El teléfono debe contener solo números.")
+            if len(phone) != 10:
+                raise forms.ValidationError("El teléfono debe tener exactamente 10 dígitos.")
+        return phone
+
     def save(self, commit=True):
         user = super().save(commit=False)
         # 👤 Todos los nuevos usuarios son comprador por defecto
@@ -84,3 +93,12 @@ class UserUpdateForm(forms.ModelForm):
         if qs.exists():
             raise forms.ValidationError("This email is already in use.")
         return email
+
+        def clean_phone(self):
+            phone = self.cleaned_data.get("phone", "")
+            if phone:
+                if not phone.isdigit():
+                    raise forms.ValidationError("El teléfono debe contener solo números.")
+                if len(phone) != 10:
+                    raise forms.ValidationError("El teléfono debe tener exactamente 10 dígitos.")
+            return phone

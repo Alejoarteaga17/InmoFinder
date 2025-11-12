@@ -1,0 +1,11 @@
+<!doctype html>
+<html>
+  <body>
+    <p>Hola {{ user.get_full_name|default:user.username }},</p>
+    <p>Gracias por registrarte en InmoFinder. Tu cuenta ha sido creada correctamente con el correo <strong>{{ user.email }}</strong>.</p>
+    <p>Puedes iniciar sesión aquí: <a href="https://{{ site }}{% url 'login' %}">Iniciar sesión</a></p>
+    <hr>
+    <p>Saludos,</p>
+    <p>InmoFinder</p>
+  </body>
+</html>

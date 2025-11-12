@@ -2,44 +2,44 @@
 <form method="get" action="{% url 'buscar_propiedades' %}" class="row g-2 filters mb-4 alineado-filtros h-100">
     
     <!-- ====== PRECIO con input + range ====== -->
-    <div class="col-md-2 height-100  align-items-center">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2 height-100 align-items-center">
         <label for="precio_min" class="form-label">Precio mín. (COP)</label>
         <input type="number" min="0" step="50000" id="precio_min" name="precio_min" class="form-control mb-1"
                 placeholder="Mín."
                 value="{{ request.GET.precio_min|default_if_none:'' }}">
-        <input type="range" id="precio_min_range" min="0" max="1000000000" step="50000">
+        <input type="range" id="precio_min_range" min="0" max="1000000000" step="50000" class="w-100">
     </div>
 
-    <div class="col-md-2 height-100  align-items-center">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2 height-100 align-items-center">
         <label for="precio_max" class="form-label">Precio máx. (COP)</label>
         <input type="number" min="0" step="50000" id="precio_max" name="precio_max" class="form-control mb-1"
                 placeholder="Máx."
                 value="{{ request.GET.precio_max|default_if_none:'' }}">
-        <input type="range" id="precio_max_range" min="0" max="1000000000" step="50000">
+        <input type="range" id="precio_max_range" min="0" max="1000000000" step="50000" class="w-100">
     </div>
 
     <!-- ====== OTROS FILTROS ====== -->
-    <div class="col-md-2 height-100 d-flex align-items-center">
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2 height-100 d-flex align-items-center">
         <input type="number" min="1" name="rooms" class="form-control w-100"
                 placeholder="Rooms" value="{{ request.GET.rooms|default_if_none:'' }}">
     </div>
-    <div class="col-md-2 height-100 d-flex align-items-center">
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2 height-100 d-flex align-items-center">
         <input type="number" min="1" name="bathrooms" class="form-control w-100"
                 placeholder="Bathrooms" value="{{ request.GET.bathrooms|default_if_none:'' }}">
     </div>
-    <div class="col-md-2 height-100 d-flex align-items-center">
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2 height-100 d-flex align-items-center">
         <input type="number" min="1" name="parking_spaces" class="form-control w-100"
                 placeholder="Parking Spaces" value="{{ request.GET.parking_spaces|default_if_none:'' }}">
     </div>
-    <div class="col-md-2">
+    <div class="col-6 col-sm-6 col-md-3 col-lg-2">
         <input type="number" min="1" name="area_min" class="form-control"
                 placeholder="Área mín. (m²)" value="{{ request.GET.area_min|default_if_none:'' }}">
     </div>
-    <div class="col-md-2">
+    <div class="col-6 col-sm-6 col-md-3 col-lg-2">
         <input type="number" min="1" name="area_max" class="form-control"
                 placeholder="Área máx. (m²)" value="{{ request.GET.area_max|default_if_none:'' }}">
     </div>
-    <div class="col-md-2">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2">
         <select name="tipo" class="form-select">
             <option value="">Type</option>
             <option value="Apartamento"   {% if request.GET.tipo == "Apartamento" %}selected{% endif %}>Piso</option>
@@ -51,18 +51,18 @@
             <option value="Loft"   {% if request.GET.tipo == "Loft" %}selected{% endif %}>Loft</option>
         </select>
     </div>
-    <div class="col-md-2 form-check height-100 d-flex align-items-center">
+    <div class="col-6 col-sm-3 col-md-2 col-lg-1 form-check height-100 d-flex align-items-center">
         <input type="checkbox" id="filter-garaje" class="form-check-input circle-check" name="garaje" value="1"
                 {% if request.GET.garaje == "1" %}checked{% endif %}>
         <label class="form-check-label" for="filter-garaje"> Garage</label>
     </div>
-    <div class="col-md-2 form-check height-100 d-flex align-items-center filter-tight-left">
+    <div class="col-6 col-sm-3 col-md-2 col-lg-1 form-check height-100 d-flex align-items-center">
         <input type="checkbox" id="filter-mascotas" class="form-check-input circle-check" name="mascotas" value="1"
                 {% if request.GET.mascotas == "1" %}checked{% endif %}>
         <label class="form-check-label" for="filter-mascotas"> Pets</label>
     </div>
 
     <div class="col-12 d-flex justify-content-end">
-        <button type="submit" class="btn btn-success btn-pill">Apply filters</button>
+        <button type="submit" class="btn btn-success btn-pill btn-filter-submit">Apply filters</button>
     </div>
 </form>
