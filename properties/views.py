@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.db.models import Q, Prefetch, Case, When, IntegerField
@@ -25,7 +26,8 @@ except Exception:
 # =========================
 #  Constantes para MEDIA
 # =========================
-
+#Limite de archivos para media
+MAX_FILES_PER_PROPERTY = 10
 # Límite por archivo en MB (básico, ajustable)
 MAX_MB = 1000
 # Se permiten imágenes y videos (por prefijo de content-type)
@@ -209,21 +211,32 @@ class PropiedadCreateView(LoginRequiredMixin, PropietarioRequiredMixin, RoleSucc
                 can_attach = getattr(form, "can_enable_multimedia", lambda: False)()
                 if can_attach:
                     files = self.request.FILES.getlist("multimedia_files")
-                    created = 0
-                    for f in files:
-                        # Validaciones mínimas de media
-                        if getattr(f, "size", None) and f.size > MAX_MB * 1024 * 1024:
-                            messages.error(self.request, f"{f.name} excede {MAX_MB} MB.")
-                            continue
-                        ctype = (getattr(f, "content_type", "") or "")
-                        if not any(ctype.startswith(p) for p in ALLOWED_CONTENT_PREFIXES):
-                            messages.error(self.request, f"{f.name}: tipo no soportado ({ctype}).")
-                            continue
+                    if files:
+                        existentes = form.instance.media.count()
+                        remanente = max(0, 10 - existentes)
 
-                        MediaPropiedad.objects.create(propiedad=form.instance, archivo=f)
-                        created += 1
-                    if created:
-                        messages.success(self.request, f"{created} archivo(s) subido(s).")
+                        if remanente <= 0:
+                            messages.error(self.request, "Límite alcanzado: esta propiedad ya tiene 10 archivos.")
+                        else:
+                            # recortar al remanente
+                            files = files[:remanente]
+                            created = 0
+                            for f in files:
+                                if getattr(f, "size", None) and f.size > MAX_MB * 1024 * 1024:
+                                    messages.error(self.request, f"{f.name} excede {MAX_MB} MB.")
+                                    continue
+                                ctype = (getattr(f, "content_type", "") or "")
+                                if not any(ctype.startswith(p) for p in ALLOWED_CONTENT_PREFIXES):
+                                    messages.error(self.request, f"{f.name}: tipo no soportado ({ctype}).")
+                                    continue
+                                try:
+                                    MediaPropiedad.objects.create(propiedad=form.instance, archivo=f)
+                                    created += 1
+                                except ValidationError as e:
+                                    # respaldo por si alguien sube en paralelo o hay carrera
+                                    messages.error(self.request, f"No se pudo añadir {f.name}: {e}")
+                            if created:
+                                messages.success(self.request, f"{created} archivo(s) subido(s).")
 
             messages.success(self.request, "Propiedad creada correctamente")
             return response
@@ -257,23 +270,41 @@ class PropiedadUpdateView(LoginRequiredMixin, PropietarioRequiredMixin, RoleSucc
 
             can_attach = getattr(form, "can_enable_multimedia", lambda: False)()
             if can_attach:
-                files = self.request.FILES.getlist("multimedia_files")
-                created = 0
-                for f in files:
-                    if getattr(f, "size", None) and f.size > MAX_MB * 1024 * 1024:
-                        messages.error(self.request, f"{f.name} excede {MAX_MB} MB.")
-                        continue
-                    ctype = (getattr(f, "content_type", "") or "")
-                    if not any(ctype.startswith(p) for p in ALLOWED_CONTENT_PREFIXES):
-                        messages.error(self.request, f"{f.name}: tipo no soportado ({ctype}).")
-                        continue
-                    MediaPropiedad.objects.create(propiedad=form.instance, archivo=f)
-                    created += 1
-                if created:
-                    messages.success(self.request, f"{created} archivo(s) subido(s).")
+                files = self.request.FILES.getlist("multimedia_files") or []
 
-        messages.success(self.request, "Propiedad actualizada correctamente")
-        return response
+                existentes = form.instance.media.count()
+                if existentes >= MAX_FILES_PER_PROPERTY:
+                    messages.error(self.request,
+                                   f"No se pueden subir más archivos: esta propiedad ya tiene {MAX_FILES_PER_PROPERTY} (imágenes o videos).")
+                else:
+                    remanente = max(0, MAX_FILES_PER_PROPERTY - existentes)
+                    # recorta por si el usuario adjunta más de lo que cabe
+                    files = files[:remanente]
+
+                    created = 0
+                    for f in files:
+                        if getattr(f, "size", None) and f.size > MAX_MB * 1024 * 1024:
+                            messages.error(self.request, f"{f.name} excede {MAX_MB} MB.")
+                            continue
+
+                        ctype = (getattr(f, "content_type", "") or "")
+                        if not any(ctype.startswith(p) for p in ALLOWED_CONTENT_PREFIXES):
+                            messages.error(self.request, f"{f.name}: tipo no soportado ({ctype}).")
+                            continue
+
+                        try:
+                            MediaPropiedad.objects.create(propiedad=form.instance, archivo=f)
+                            created += 1
+                        except ValidationError as e:
+                            msg = getattr(e, "message", None) or \
+                                  (getattr(e, "messages", None) or ["Error de validación"])[0]
+                            messages.error(self.request, f"No se pudo añadir {f.name}: {msg}")
+
+                    if created:
+                        messages.success(self.request, f"{created} archivo(s) subido(s).")
+
+            messages.success(self.request, "Propiedad actualizada correctamente")
+            return response
 
 
 class PropiedadDeleteView(LoginRequiredMixin, PropietarioRequiredMixin, RoleSuccessUrlMixin, DeleteView):
@@ -348,9 +379,20 @@ def media_list(request, propiedad_id):
             messages.info(request, "No se recibieron archivos.")
             return redirect("media_list", propiedad_id=propiedad_id)
 
+        existentes = propiedad.media.count()
+        remanente = max(0, MAX_FILES_PER_PROPERTY - existentes)
+
+        if remanente <= 0:
+            messages.error(request, f"Límite alcanzado: esta propiedad ya tiene {MAX_FILES_PER_PROPERTY} archivos.")
+            return redirect("media_list", propiedad_id=propiedad_id)
+
+        # recorta la selección a lo que cabe
+        files = files[:remanente]
+
         created = 0
         with transaction.atomic():
             for f in files:
+                # Validaciones rápidas de tamaño/tipo (UX); el modelo igual vuelve a validar
                 if getattr(f, "size", None) and f.size > MAX_MB * 1024 * 1024:
                     messages.error(request, f"{f.name} excede {MAX_MB} MB.")
                     continue
@@ -358,8 +400,16 @@ def media_list(request, propiedad_id):
                 if not any(ctype.startswith(p) for p in ALLOWED_CONTENT_PREFIXES):
                     messages.error(request, f"{f.name}: tipo no soportado ({ctype}).")
                     continue
-                MediaPropiedad.objects.create(propiedad=propiedad, archivo=f)
-                created += 1
+
+                # Captura el ValidationError del modelo para evitar la página de error
+                try:
+                    MediaPropiedad.objects.create(propiedad=propiedad, archivo=f)
+                    created += 1
+                except ValidationError as e:
+                    # Primera cadena disponible del error
+                    msg = getattr(e, "message", None) or \
+                          (getattr(e, "messages", None) or ["Error de validación"])[0]
+                    messages.error(request, f"No se pudo añadir {f.name}: {msg}")
 
         if created:
             messages.success(request, f"{created} archivo(s) subido(s).")

@@ -161,24 +161,39 @@
       </div>
     </div>
 
-    <!-- Multimedia -->
-    <div class="card mb-4">
-      <div class="card-header bg-dark text-white">Multimedia</div>
-      <div class="card-body">
-        <div class="form-group">
-          <label for="id_multimedia_files">Upload Images / Videos</label>
-          <input type="file" name="multimedia_files" class="form-control" id="id_multimedia_files" multiple>
-          <small class="form-text text-muted">{{ form.multimedia_files.help_text }}</small>
+<!-- Multimedia -->
+<div class="card mb-4">
+  <div class="card-header bg-dark text-white">Multimedia</div>
+  <div class="card-body">
+    <div class="form-group">
+      <label for="id_multimedia_files">Subir imágenes / videos</label>
+      <input
+        type="file"
+        name="multimedia_files"
+        id="id_multimedia_files"
+        class="form-control"
+        multiple
+        accept="image/*,video/*"
+      >
+      <small class="form-text text-muted">Máximo 10 fotos o videos por propiedad.</small>
+
+      {% if form.multimedia_files.errors %}
+        <div class="invalid-feedback d-block">
+          {{ form.multimedia_files.errors|striptags }}
         </div>
-      </div>
+      {% endif %}
     </div>
+  </div>
+</div>
+
 
     <!-- Botones -->
     <div class="d-flex justify-content-end">
       <button type="submit" class="btn btn-success me-2">Save</button>
       <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
     </div>
-
+    </div>
   </form>
+
 </div>
 {% endblock %}
