@@ -566,6 +566,8 @@ def buscar_propiedades(request):
       - Filtros numéricos/categóricos.
       - Ordenamiento estándar o preservando ranking de similitud.
       - Prefetch de media y paginación.
+    
+    Optimizado para usar cache de embeddings en memoria.
     """
     propiedades = Propiedad.objects.all()
 
@@ -576,12 +578,15 @@ def buscar_propiedades(request):
     if search:
         if emb_buscar is not None:
             try:
-                results = emb_buscar(search, top_k=500)
+                # Reducido a top_k=100 para mejor rendimiento
+                # Los embeddings ya están en cache, evitando I/O de disco
+                results = emb_buscar(search, top_k=100)
                 ids_ranked = [r.get("id") for r in results if r.get("id")]
                 if ids_ranked:
                     propiedades = propiedades.filter(id__in=ids_ranked)
                     used_embeddings = True
             except Exception:
+                # Fallback a búsqueda SQL tradicional
                 propiedades = propiedades.filter(
                     Q(title__icontains=search) |
                     Q(description__icontains=search) |
@@ -681,6 +686,7 @@ def buscar_propiedades(request):
         "propiedades": page_obj,
         "favorite_ids": favorite_ids,
         "querystring": querystring,
+        "search_query": search or "",  # Pasar el término de búsqueda al template
     })
 
 

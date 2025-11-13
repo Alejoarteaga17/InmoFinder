@@ -36,7 +36,9 @@
       <div class="col order-3 order-md-2">
         <form method="get" action="{% url 'buscar_propiedades' %}" class="search position-relative w-100">
           <span class="search-icon"><i class="bi bi-search"></i></span>
-          <input class="form-control search-input w-100" type="text" name="search" placeholder="Search by location, name or description">
+          <input class="form-control search-input w-100" type="text" name="search" 
+                 placeholder="Search by location, name or description"
+                 value="{{ request.GET.search|default_if_none:'' }}">
         </form>
       </div>
 
