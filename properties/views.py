@@ -374,7 +374,18 @@ def detalle_propiedad(request, propiedad_id):
         request.session.modified = True
     except Exception:
         pass
-    return render(request, "properties/detalle_propiedad.html", {"propiedad": propiedad})
+    # ¿Es favorito del usuario actual?
+    is_favorite = False
+    if request.user.is_authenticated:
+        try:
+            is_favorite = Favorite.objects.filter(user=request.user, propiedad=propiedad).exists()
+        except Exception:
+            is_favorite = False
+
+    return render(request, "properties/detalle_propiedad.html", {
+        "propiedad": propiedad,
+        "is_favorite": is_favorite,
+    })
 
 
 # =========================
@@ -411,7 +422,7 @@ def media_list(request, propiedad_id):
             messages.info(request, "No se recibieron archivos.")
             return redirect("media_list", propiedad_id=propiedad_id)
 
-        existentes = propiedad.media.count()
+        existentes = propiedad.media.count() # type: ignore
         remanente = max(0, MAX_FILES_PER_PROPERTY - existentes)
 
         if remanente <= 0:
@@ -470,7 +481,7 @@ def media_delete(request, propiedad_id, media_id):
 # =========================
 #  Contactar propietario (envío)
 # =========================
-@login_required
+@login_required # type: ignore
 @require_POST
 def contact_owner(request, propiedad_id):
     """

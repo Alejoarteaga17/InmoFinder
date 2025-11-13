@@ -20,7 +20,7 @@
 
 {% block styles %}{% endblock %}
 </head>
-<body class="{% block body_class %}{% endblock %}" {% block body_style %}{% endblock %}>
+<body class="d-flex flex-column min-vh-100 {% block body_class %}{% endblock %}" {% block body_style %}{% endblock %}>
 
 <header>
   <nav class="container py-2 py-md-3">
@@ -40,37 +40,19 @@
         </form>
       </div>
 
-
-    <!-- Parte derecha: login (si no hay sesión) + hamburguesa -->
-    <div class="d-flex align-items-center gap-3">
-      {% if not user.is_authenticated %}
-        <!-- Icono persona -->
-        <a href="{% url 'login' %}" class=" text-dark p-0 m-0"
-          title="Iniciar sesión o registrarse">
-          <i class="bi bi-person fs-3"></i>
-        </a>
-      {% endif %}
-
-      <!-- Botón hamburguesa (siempre visible) -->
-      <button class="menu p-0"
-              data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas"
-              aria-controls="menuOffcanvas">
-        <i class="bi bi-list fs-2"></i>
-      </button>
-      <!-- Parte derecha: login + hamburguesa -->
-      <div class="col-auto order-2 order-md-3 ms-auto">
-        <div class="d-flex align-items-center gap-2 gap-md-3">
-          {% if not user.is_authenticated %}
-            <!-- Icono persona -->
-            <a href="{% url 'login' %}" class="text-dark p-0 m-0" title="Iniciar sesión o registrarse">
-              <i class="bi bi-person fs-3"></i>
-            </a>
-          {% endif %}
-          <!-- Botón hamburguesa -->
-          <button class="menu p-0" data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas" aria-controls="menuOffcanvas">
-            <i class="bi bi-list fs-2"></i>
-          </button>
-        </div>
+    <!-- Parte derecha: un único bloque con login (si no hay sesión) + hamburguesa -->
+    <div class="col-auto order-2 order-md-3 ms-auto">
+      <div class="d-flex align-items-center gap-2 gap-md-3">
+        {% if not user.is_authenticated %}
+          <!-- Icono persona -->
+          <a href="{% url 'login' %}" class="text-dark p-0 m-0" title="Iniciar sesión o registrarse">
+            <i class="bi bi-person fs-3"></i>
+          </a>
+        {% endif %}
+        <!-- Botón hamburguesa (siempre visible) -->
+        <button class="menu p-0" data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas" aria-controls="menuOffcanvas">
+          <i class="bi bi-list fs-2"></i>
+        </button>
       </div>
     </div>
         </div>
@@ -100,7 +82,7 @@
 
 
 <!-- Contenido principal -->
-<main class="container">
+<main class="container flex-grow-1">
 <!-- Mensajes de Django -->
 {% if messages %}
   <div class="mt-3">

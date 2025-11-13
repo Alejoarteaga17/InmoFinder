@@ -44,7 +44,29 @@
 
     <!-- Información de la propiedad -->
     <div class="info-propiedad">
-        <p class="fw-bold text-ink">Precio Total: $ {{ propiedad.price_cop|intcomma }} COP</p>
+        <div class="d-flex align-items-center justify-content-between mb-2">
+            <p class="fw-bold text-ink m-0">Precio Total: $ {{ propiedad.price_cop|intcomma }} COP</p>
+            {% if user.is_authenticated %}
+            <button
+                type="button"
+                class="btn btn-link p-0 toggle-favorite favorite-btn"
+                data-property-id="{{ propiedad.id }}"
+                data-id="{{ propiedad.id }}"
+                data-toggle-url="{% url 'toggle_favorite' propiedad.id %}"
+                aria-label="Toggle Favorite"
+                title="Agregar a favoritos">
+                {% if is_favorite %}
+                    <i class="bi bi-heart-fill text-danger fs-4"></i>
+                {% else %}
+                    <i class="bi bi-heart text-dark fs-4"></i>
+                {% endif %}
+            </button>
+            {% else %}
+            <a href="{% url 'login' %}?next={% url 'detalle_propiedad' propiedad.id %}?modal=1" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center">
+                <i class="bi bi-heart me-1"></i> Favorite
+            </a>
+            {% endif %}
+        </div>
         <p>
             <span class="price-m2-badge">
                 {% if propiedad.price_m2 %}

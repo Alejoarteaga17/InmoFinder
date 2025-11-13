@@ -186,3 +186,16 @@ header .btn-link, header .btn-link i {
 	box-shadow: none !important;
 }
 
+/* Hover effects for favorite heart */
+.toggle-favorite { cursor: pointer; }
+.toggle-favorite i {
+	transition: transform .15s ease, color .15s ease, opacity .15s ease;
+}
+.toggle-favorite:hover i {
+	transform: scale(1.08);
+}
+/* When not yet favorite (outline heart), hint red on hover */
+.toggle-favorite:hover i.bi-heart {
+	color: #dc3545 !important; /* Bootstrap danger */
+}
+
