@@ -52,11 +52,36 @@ class RegisterForm(UserCreationForm):
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
-        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Email"})
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Email or Username"})
     )
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Password"})
     )
+
+    def clean(self):
+        """
+        Allow login using either email (default USERNAME_FIELD) or username.
+        """
+        from django.contrib.auth import authenticate, get_user_model
+        cleaned_data = super(forms.Form, self).clean()
+        identifier = cleaned_data.get("username")
+        password = cleaned_data.get("password")
+        if identifier and password:
+            User = get_user_model()
+            login_key = identifier
+            # If it doesn't look like an email, try to resolve it by username -> email
+            if "@" not in identifier:
+                try:
+                    user_obj = User.objects.get(username__iexact=identifier)
+                    # Our auth backend expects 'username' param as USERNAME_FIELD (email)
+                    login_key = getattr(user_obj, "email", None) or identifier
+                except User.DoesNotExist:
+                    pass  # let authenticate fail
+            self.user_cache = authenticate(self.request, username=login_key, password=password)
+            if self.user_cache is None:
+                raise self.get_invalid_login_error()
+            self.confirm_login_allowed(self.user_cache)
+        return cleaned_data
 
 
 class UserUpdateForm(forms.ModelForm):
