@@ -227,3 +227,39 @@ button[id="openContactBtn"]:hover {
 	color: var(--brand-blue) !important;
 	border: 1px solid var(--brand-blue-medium);
 }
+
+/* ===== User Control: brand-blue checkboxes ===== */
+.user-control .form-check-input:checked {
+	background-color: var(--brand-blue) !important;
+	border-color: var(--brand-blue) !important;
+}
+.user-control .form-check-input:focus {
+	border-color: var(--brand-blue) !important;
+	box-shadow: 0 0 0 .25rem rgba(0, 124, 224, 0.25) !important;
+}
+.user-control .form-check-input[type="checkbox"]:indeterminate {
+	background-color: var(--brand-blue) !important;
+	border-color: var(--brand-blue) !important;
+}
+
+/* ===== Fondo azul claro para páginas de perfil ===== */
+/* Body-level full background for profile pages */
+.profile-bg-page {
+	min-height: 100vh;
+	background: linear-gradient(135deg, var(--brand-blue-light) 0%, #F0F8FF 100%);
+	background-attachment: fixed;
+}
+
+.profile-bg {
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	padding-top: 2rem;
+	padding-bottom: 2rem;
+}
+
+.profile-bg .card {
+	background: rgba(255, 255, 255, 0.98);
+	backdrop-filter: blur(10px);
+}
+

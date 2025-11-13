@@ -73,6 +73,7 @@
     {% if user.is_authenticated %}
       {% if user.is_admin %}
         <a href="{% url 'admin_dashboard' %}" class="text-decoration-none text-dark">Dashboard Admin</a>
+          <a href="{% url 'user_control' %}" class="text-decoration-none text-dark">User Control</a>
       {% elif user.is_propietario %}
         <a href="{% url 'dashboard' %}" class="text-decoration-none text-dark">Dashboard Owner</a>
       {% endif %}

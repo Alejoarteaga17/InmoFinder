@@ -14,6 +14,10 @@ from django.urls import reverse
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import default_token_generator
+from django.views import View
+from django.contrib.auth import get_user_model
+from .mixins import AdminRequiredMixin
+from typing import Any
 
 # Create your views here.
 
@@ -186,3 +190,66 @@ class ChangePasswordView(PasswordChangeView):
     def form_valid(self, form):
         messages.success(self.request, "Your password has been changed.")
         return super().form_valid(form)
+
+
+class UserControlView(AdminRequiredMixin, View):
+    """
+    Admin-only page to view all users and toggle their roles via checkboxes.
+    Roles managed:
+    - is_admin (also sets is_staff/is_superuser through model save)
+    - is_propietario
+    - is_comprador
+
+    Safeguards:
+    - Prevent demoting self from admin within this page to avoid lockout.
+    - Ensure at least one role is True; if none selected, default to comprador.
+    """
+
+    template_name = "users/user_control.html"
+
+    def get(self, request):
+        User = get_user_model()
+        users = User.objects.all().order_by("id")
+        return render(request, self.template_name, {"users": users})
+
+    def post(self, request):
+        User = get_user_model()
+        user_ids = request.POST.getlist("user_ids")
+        updated = 0
+        warnings = 0
+        for uid in user_ids:
+            try:
+                u = User.objects.get(pk=uid)
+            except User.DoesNotExist:
+                continue
+
+            # Read checkbox values; presence means True
+            want_admin = request.POST.get(f"is_admin_{u.pk}") == "on"
+            want_prop = request.POST.get(f"is_propietario_{u.pk}") == "on"
+            want_comp = request.POST.get(f"is_comprador_{u.pk}") == "on"
+
+            # prevent removing own admin
+            if u.pk == request.user.pk and not want_admin and getattr(u, "is_admin", False):
+                warnings += 1
+                want_admin = True  # keep admin
+
+            # at least one role
+            if not (want_admin or want_prop or want_comp):
+                want_comp = True
+
+            cur_admin = bool(getattr(u, "is_admin", False))
+            cur_prop = bool(getattr(u, "is_propietario", False))
+            cur_comp = bool(getattr(u, "is_comprador", False))
+            changed = (cur_admin != want_admin) or (cur_prop != want_prop) or (cur_comp != want_comp)
+            if changed:
+                setattr(u, "is_admin", want_admin)
+                setattr(u, "is_propietario", want_prop)
+                setattr(u, "is_comprador", want_comp)
+                u.save()
+                updated += 1
+
+        if updated:
+            messages.success(request, f"Updated roles for {updated} user(s).")
+        if warnings:
+            messages.warning(request, "You cannot remove your own admin role via this page; change ignored for your account.")
+        return redirect("user_control")

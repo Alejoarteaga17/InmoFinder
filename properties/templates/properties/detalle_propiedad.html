@@ -92,20 +92,50 @@
             </span>
         </p>
 
-        <ul class="list-unstyled small">
-            <li><b>Área:</b> {{ propiedad.area_m2 }} m²</li>
-            <li><b>Rooms:</b> {{ propiedad.rooms }}</li>
-            <li><b>Bathrooms:</b> {{ propiedad.bathrooms }}</li>
-            <li><b>Parking Spaces:</b> {{ propiedad.parking_spaces }}</li>
-            <li><b>Garage:</b> {% if propiedad.parking_spaces > 0 %}Sí{% else %}No{% endif %}</li>
-            <li><b>Pets:</b> {% if propiedad.pets_allowed %}Permitidas{% else %}No permitidas{% endif %}</li>
-            <li><b>Property Type:</b> {{ propiedad.get_property_type_display }}</li>
-            <li><b>Stratum:</b> {{ propiedad.estrato }}</li>
-            <li><b>Floor:</b> {{ propiedad.floor }}</li>
-        <li><b>Amenities:</b> {% if propiedad.amenities %}{{ propiedad.amenities|join:", " }}{% else %}No amenities available{% endif %}</li>
-        </ul>
+        <div class="property-details-table">
+            <div class="detail-row">
+                <span class="detail-label">Área:</span>
+                <span class="detail-value">{{ propiedad.area_m2 }} m²</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Rooms:</span>
+                <span class="detail-value">{{ propiedad.rooms }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Bathrooms:</span>
+                <span class="detail-value">{{ propiedad.bathrooms }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Parking Spaces:</span>
+                <span class="detail-value">{{ propiedad.parking_spaces }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Garage:</span>
+                <span class="detail-value">{% if propiedad.parking_spaces > 0 %}Sí{% else %}No{% endif %}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Pets:</span>
+                <span class="detail-value">{% if propiedad.pets_allowed %}Permitidas{% else %}No permitidas{% endif %}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Property Type:</span>
+                <span class="detail-value">{{ propiedad.get_property_type_display }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Stratum:</span>
+                <span class="detail-value">{{ propiedad.estrato }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Floor:</span>
+                <span class="detail-value">{{ propiedad.floor }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Amenities:</span>
+                <span class="detail-value">{% if propiedad.amenities %}{{ propiedad.amenities|join:", " }}{% else %}No amenities available{% endif %}</span>
+            </div>
+        </div>
 
-        <h6>Description</h6>
+        <h6 class="mt-3">Description</h6>
         <p class="mb-2">{{ propiedad.description }}</p>
     </div>
 

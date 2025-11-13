@@ -1,8 +1,10 @@
 {% extends 'properties/base.html' %}
+{% block body_class %}profile-bg-page{% endblock %}
 {% block content %}
+<section class="profile-bg">
   <div class="container py-5">
-    <h2 class="text-center">Mi Perfil</h2>
-    <p class="text-center">Bienvenido, {{ user.username }}</p>
+    <h2 class="text-center mb-2">Mi Perfil</h2>
+    <p class="text-center mb-4">Bienvenido, {{ user.username }}</p>
     <div class="row justify-content-center mt-4">
       <div class="col-md-6">
         <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
@@ -15,6 +17,8 @@
             <p class="card-text"><strong>Phone:</strong> {{ user.phone }}</p>
             {% if user.profile.is_owner %}
               <p class="card-text"><strong>User Type:</strong> Owner</p>
+            {% elif user.profile.is_admin or user.is_admin %}  
+              <p class="card-text"><strong>User Type:</strong> Admin</p>
             {% else %}
               <p class="card-text"><strong>User Type:</strong> Client</p>
             {% endif %}
@@ -24,5 +28,8 @@
             </div>
           </div>
         </div>
-      </div>  </div>
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}
