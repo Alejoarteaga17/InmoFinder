@@ -1,8 +1,10 @@
 {% extends 'properties/base.html' %}
+{% block body_class %}profile-bg-page{% endblock %}
 {% block content %}
+<section class="profile-bg">
   <div class="container py-5">
-    <h2 class="text-center">Mi Perfil</h2>
-    <p class="text-center">Bienvenido, {{ user.username }}</p>
+    <h2 class="text-center mb-2">Mi Perfil</h2>
+    <p class="text-center mb-4">Bienvenido, {{ user.username }}</p>
     <div class="row justify-content-center mt-4">
       <div class="col-md-6">
         <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
@@ -24,5 +26,8 @@
             </div>
           </div>
         </div>
-      </div>  </div>
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}
