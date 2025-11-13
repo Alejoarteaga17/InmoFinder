@@ -13,6 +13,7 @@ urlpatterns = [
     path("profile/password/", views.ChangePasswordView.as_view(), name="change_password"),
     path("favorites/", views.favorites_list, name="favorites"),
     path("favorites/clear/", views.clear_favorites, name="clear_favorites"),
+    path("admin/users/", views.UserControlView.as_view(), name="user_control"),
 
 
 ]

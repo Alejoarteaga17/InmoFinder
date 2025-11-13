@@ -17,6 +17,8 @@
             <p class="card-text"><strong>Phone:</strong> {{ user.phone }}</p>
             {% if user.profile.is_owner %}
               <p class="card-text"><strong>User Type:</strong> Owner</p>
+            {% elif user.profile.is_admin or user.is_admin %}  
+              <p class="card-text"><strong>User Type:</strong> Admin</p>
             {% else %}
               <p class="card-text"><strong>User Type:</strong> Client</p>
             {% endif %}
