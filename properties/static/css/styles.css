@@ -174,14 +174,26 @@
 .detalle-propiedad {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 30px;
+    grid-template-areas:
+        "gallery info"
+        "contact info"
+        "map     map";
+    column-gap: 30px;   /* espacio horizontal entre columnas */
+    row-gap: 12px;      /* menos espacio vertical entre filas */
     margin: 30px 0;
+    align-items: start; /* Evita que los hijos se estiren a la altura de la fila */
 }
 
 @media (max-width: 991.98px) {
     .detalle-propiedad {
         grid-template-columns: 1fr;
-        gap: 20px;
+        grid-template-areas:
+            "gallery"
+            "contact"
+            "info"
+            "map";
+        row-gap: 12px;   /* mantener poco espacio vertical en móvil */
+        column-gap: 0;
         margin: 20px 0;
     }
 }
@@ -192,6 +204,29 @@
     overflow: hidden;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    align-self: start; /* Asegura que la galería no se estire verticalmente */
+    grid-area: gallery;
+}
+.mapa-bloque {
+    grid-area: map; /* que el mapa ocupe todo el ancho del grid (ambas columnas) */
+}
+
+/* Reducir altura visual del mapa en desktop para que no sea tan grande */
+.mapa-bloque .ratio {
+    /* Bootstrap 5 usa esta variable para calcular la altura del contenedor ratio */
+    --bs-aspect-ratio: 45%; /* más bajo que 56.25% (16:9) para reducir altura */
+}
+
+/* En móviles mantenemos una altura un poco mayor para legibilidad */
+@media (max-width: 767.98px) {
+    .mapa-bloque .ratio { --bs-aspect-ratio: 56.25%; } /* 16:9 por defecto */
+}
+
+
+/* Evita que el bloque de información se estire por reglas externas */
+.info-propiedad { 
+    align-self: start; 
+    grid-area: info;
 }
 
 .slider {
@@ -271,10 +306,11 @@
 
 /* Center the interest block inside its grid cell (row with the map) */
 .detalle-propiedad .interes {
-    align-self: center;       /* vertical center within the grid row */
-    justify-self: center;     /* horizontal center within the column */
-    display: grid;
-    place-items: center;      /* center inner content */
+    align-self: start;        /* acercar al contenido anterior (descripción) */
+    justify-self: center;     /* centrar el bloque del botón bajo la galería */
+    text-align: center;       /* centrar contenido interno */
+    margin-top: 12px;         /* pequeña separación del bloque anterior */
+    grid-area: contact;
 }
 
 /* ===== Consistent card layout for homepage/search results ===== */
@@ -283,13 +319,14 @@
     border-radius: 0.5rem;
     overflow: hidden; /* ensures image respects card radius */
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .property-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    background-color: #F0F8FF; 
 }
-
 /* Fix image height and cover fit */
 .property-card .cover-img {
     height: 200px;
