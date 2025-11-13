@@ -50,6 +50,31 @@ html, body {
 	color: var(--brand-brown-contrast) !important;
 }
 
+/* Keep danger buttons red despite global .btn override */
+.btn-danger,
+.btn-danger:focus {
+	background-color: #dc3545 !important; /* Bootstrap danger */
+	border-color: #dc3545 !important;
+	color: #fff !important;
+}
+.btn-danger:hover,
+.btn-danger:active {
+	background-color: #bb2d3b !important; /* Bootstrap danger hover */
+	border-color: #b02a37 !important;
+	color: #fff !important;
+}
+.btn-outline-danger {
+	color: #dc3545 !important;
+	border-color: #dc3545 !important;
+	background-color: transparent !important;
+}
+.btn-outline-danger:hover,
+.btn-outline-danger:focus {
+	background-color: #dc3545 !important;
+	border-color: #dc3545 !important;
+	color: #fff !important;
+}
+
 .btn:active,
 .btn-primary:active,
 .btn-secondary:active,

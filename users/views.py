@@ -214,6 +214,21 @@ class UserControlView(AdminRequiredMixin, View):
 
     def post(self, request):
         User = get_user_model()
+        # Deletion flow
+        delete_id = request.POST.get("delete_user_id")
+        if delete_id:
+            try:
+                u = User.objects.get(pk=delete_id)
+            except User.DoesNotExist:
+                messages.error(request, "User not found.")
+                return redirect("user_control")
+            if u.pk == request.user.pk:
+                messages.warning(request, "You cannot delete your own account from this page.")
+                return redirect("user_control")
+            u.delete()
+            messages.success(request, "User account deleted permanently.")
+            return redirect("user_control")
+
         user_ids = request.POST.getlist("user_ids")
         updated = 0
         warnings = 0
@@ -224,6 +239,7 @@ class UserControlView(AdminRequiredMixin, View):
                 continue
 
             # Read checkbox values; presence means True
+            want_active = request.POST.get(f"is_active_{u.pk}") == "on"
             want_admin = request.POST.get(f"is_admin_{u.pk}") == "on"
             want_prop = request.POST.get(f"is_propietario_{u.pk}") == "on"
             want_comp = request.POST.get(f"is_comprador_{u.pk}") == "on"
@@ -232,6 +248,10 @@ class UserControlView(AdminRequiredMixin, View):
             if u.pk == request.user.pk and not want_admin and getattr(u, "is_admin", False):
                 warnings += 1
                 want_admin = True  # keep admin
+            # prevent deactivating self
+            if u.pk == request.user.pk and not want_active and getattr(u, "is_active", True):
+                warnings += 1
+                want_active = True
 
             # at least one role
             if not (want_admin or want_prop or want_comp):
@@ -240,8 +260,10 @@ class UserControlView(AdminRequiredMixin, View):
             cur_admin = bool(getattr(u, "is_admin", False))
             cur_prop = bool(getattr(u, "is_propietario", False))
             cur_comp = bool(getattr(u, "is_comprador", False))
-            changed = (cur_admin != want_admin) or (cur_prop != want_prop) or (cur_comp != want_comp)
+            cur_active = bool(getattr(u, "is_active", True))
+            changed = (cur_active != want_active) or (cur_admin != want_admin) or (cur_prop != want_prop) or (cur_comp != want_comp)
             if changed:
+                setattr(u, "is_active", want_active)
                 setattr(u, "is_admin", want_admin)
                 setattr(u, "is_propietario", want_prop)
                 setattr(u, "is_comprador", want_comp)
@@ -251,5 +273,5 @@ class UserControlView(AdminRequiredMixin, View):
         if updated:
             messages.success(request, f"Updated roles for {updated} user(s).")
         if warnings:
-            messages.warning(request, "You cannot remove your own admin role via this page; change ignored for your account.")
+            messages.warning(request, "Some changes were adjusted: you cannot remove your own admin role or deactivate your own account here.")
         return redirect("user_control")

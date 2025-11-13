@@ -19,9 +19,11 @@
               <th style="width: 60px;">ID</th>
               <th>User</th>
               <th>Email</th>
+              <th class="text-center">Active</th>
               <th class="text-center">Admin</th>
               <th class="text-center">Propietario</th>
               <th class="text-center">Comprador</th>
+              <th class="text-center" style="width: 120px;">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -34,6 +36,9 @@
               <td>{{ u.get_full_name|default:u.username }}</td>
               <td>{{ u.email }}</td>
               <td class="text-center">
+                <input class="form-check-input" type="checkbox" name="is_active_{{ u.id }}" {% if u.is_active %}checked{% endif %}>
+              </td>
+              <td class="text-center">
                 <input class="form-check-input" type="checkbox" name="is_admin_{{ u.id }}" {% if u.is_admin %}checked{% endif %}>
               </td>
               <td class="text-center">
@@ -41,6 +46,11 @@
               </td>
               <td class="text-center">
                 <input class="form-check-input" type="checkbox" name="is_comprador_{{ u.id }}" {% if u.is_comprador %}checked{% endif %}>
+              </td>
+              <td class="text-center">
+                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDelete-{{ u.id }}">
+                  Delete
+                </button>
               </td>
             </tr>
             {% empty %}
@@ -56,6 +66,31 @@
         <button class="btn btn-primary" type="submit">Save Changes</button>
       </div>
     </form>
+    {% for u in users %}
+    <!-- Delete confirmation modal for user {{ u.id }} -->
+    <div class="modal fade" id="confirmDelete-{{ u.id }}" tabindex="-1" aria-labelledby="confirmDeleteLabel-{{ u.id }}" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="confirmDeleteLabel-{{ u.id }}">Delete User</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p class="mb-0">You're about to delete the account <strong>{{ u.get_full_name|default:u.username }}</strong> ({{ u.email }}).</p>
+            <p class="mb-0 text-danger">This action cannot be undone.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="delete_user_id" value="{{ u.id }}">
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
   </div>
 </section>
 {% endblock %}
