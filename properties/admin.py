@@ -5,6 +5,7 @@ from .models import Propiedad, MediaPropiedad
 class MediaPropiedadInline(admin.TabularInline):
     model = MediaPropiedad
     extra = 1
+    max_num = 10
 
 
 @admin.register(Propiedad)

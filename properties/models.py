@@ -1,11 +1,9 @@
-from django.db import models
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
-from django.conf import settings
-from django.core.exceptions import ValidationError
 from mimetypes import guess_type
 
-
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.db import models
 
 User = get_user_model()
 
@@ -93,7 +91,7 @@ class Propiedad(models.Model):
 
 
 class MediaPropiedad(models.Model):
-
+    MAX_FILES_PER_PROPERTY = 10
     MAX_FILE_MB = 1000  # 1000 MB
     ALLOWED_PREFIXES = ("image/", "video/")
 
@@ -137,11 +135,13 @@ class MediaPropiedad(models.Model):
 
     # ------ Validaciones ------
     def clean(self):
-        # Al menos uno: archivo o url
+        super().clean()
+
+        # --- 1) Al menos uno: archivo o url
         if not self.archivo and not self.url:
             raise ValidationError("Provide a file or an external URL.")
 
-        # Si viene archivo, validar tamaño y tipo
+        # --- 2) Validaciones de archivo (si viene archivo)
         if self.archivo:
             size = getattr(self.archivo, "size", None)
             if size is not None and size > self.MAX_FILE_MB * 1024 * 1024:
@@ -151,11 +151,28 @@ class MediaPropiedad(models.Model):
             if ctype and not any(ctype.startswith(p) for p in self.ALLOWED_PREFIXES):
                 raise ValidationError(f"Unsupported content type: {ctype}. Allowed: images/videos.")
 
-        # Si viene URL, inferir tipo por MIME/extensión
+        # --- 3) Validaciones de URL (si viene URL)
         if self.url:
             mime, tipo = self._infer_mime_and_type()
             if not any(mime.startswith(p) for p in self.ALLOWED_PREFIXES):
                 raise ValidationError(f"Unsupported URL content type: {mime}. Allowed: images/videos.")
+
+        # --- 4) Tope total (imágenes + videos) = 10 por propiedad
+        # Solo valida si hay propiedad (en admin inline y en vistas debería haberla)
+        if not self.propiedad_id and getattr(self, "propiedad", None):
+            # por si tienes la FK en memoria pero no el id aún
+            self.propiedad_id = self.propiedad.pk
+
+        if self.propiedad_id:
+            qs = MediaPropiedad.objects.filter(propiedad_id=self.propiedad_id)
+            # si es actualización, no contarse a sí mismo
+            if self.pk:
+                qs = qs.exclude(pk=self.pk)
+
+            if qs.count() >= self.MAX_FILES_PER_PROPERTY:
+                raise ValidationError(
+                    f"Esta propiedad ya alcanzó el máximo de {self.MAX_FILES_PER_PROPERTY} archivos (imágenes + videos)."
+                )
 
     def save(self, *args, **kwargs):
         # Ejecutar validaciones de modelo siempre

@@ -9,6 +9,12 @@
 	--brand-brown-700: #222222;     /* active */
 	--brand-brown-contrast: #ffffff;
 	--brand-focus-ring: rgba(68, 68, 68, 0.35);
+	
+	/* Colores del logo */
+	--brand-blue: #007CE0;          /* azul principal del logo */
+	--brand-blue-hover: #0066BB;    /* hover más oscuro */
+	--brand-blue-light: #E6F3FF;    /* azul muy claro para badges */
+	--brand-blue-medium: #B3DBFF;   /* azul claro medio */
 }
 
 /* Typography: ensure Inter everywhere (already set in main.css, this is a safety net) */
@@ -186,3 +192,38 @@ header .btn-link, header .btn-link i {
 	box-shadow: none !important;
 }
 
+/* Hover effects for favorite heart */
+.toggle-favorite { cursor: pointer; }
+.toggle-favorite i {
+	transition: transform .15s ease, color .15s ease, opacity .15s ease;
+}
+.toggle-favorite:hover i {
+	transform: scale(1.08);
+}
+/* When not yet favorite (outline heart), hint red on hover */
+.toggle-favorite:hover i.bi-heart {
+	color: #dc3545 !important; /* Bootstrap danger */
+}
+
+/* ===== Botón de contacto con azul del logo ===== */
+#openContactBtn,
+.btn-contact,
+button[id="openContactBtn"],
+a[href*="contact"] .btn-success {
+	background-color: var(--brand-blue) !important;
+	border-color: var(--brand-blue) !important;
+	color: white !important;
+}
+#openContactBtn:hover,
+.btn-contact:hover,
+button[id="openContactBtn"]:hover {
+	background-color: var(--brand-blue-hover) !important;
+	border-color: var(--brand-blue-hover) !important;
+}
+
+/* ===== Badge precio por m² con azul claro ===== */
+.price-m2-badge {
+	background-color: var(--brand-blue-light) !important;
+	color: var(--brand-blue) !important;
+	border: 1px solid var(--brand-blue-medium);
+}

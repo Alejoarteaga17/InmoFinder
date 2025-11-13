@@ -38,11 +38,11 @@
                         </div>
 
                         <div class="card-footer bg-white border-0 pt-0">
-                            <div class="d-flex flex-wrap gap-2 justify-content-center">
-                                <a href="{% url 'edit' propiedad.id %}" class="btn btn-sm btn-warning">Edit</a>
-                                <a href="{% url 'delete' propiedad.id %}" class="btn btn-sm btn-danger">Delete</a>
+                            <div class="d-flex flex-column flex-sm-row flex-wrap gap-2 justify-content-center">
+                                <a href="{% url 'edit' propiedad.id %}" class="btn btn-sm btn-warning flex-fill">Edit</a>
+                                <a href="{% url 'delete' propiedad.id %}" class="btn btn-sm btn-danger flex-fill">Delete</a>
                                 {% with media_list=propiedad.media.all %}
-                                    <a href="{% url 'media_list' propiedad.id %}" class="btn btn-sm btn-info text-white">View Media</a>
+                                    <a href="{% url 'media_list' propiedad.id %}" class="btn btn-sm btn-info text-white flex-fill">View Media</a>
                                 {% endwith %}
                             </div>
                         </div>

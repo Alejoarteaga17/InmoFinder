@@ -25,6 +25,35 @@
 html, body {
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji", "Segoe UI Symbol";
   background: #f5f3f3;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Asegurar que el contenido no sobresalga */
+* {
+  box-sizing: border-box;
+}
+
+main.container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Prevenir overflow horizontal */
+.row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+img, video, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Asegurar que los forms no sobresalgan */
+form {
+  max-width: 100%;
 }
 
 /* Header */
@@ -37,11 +66,24 @@ header {
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
 }
+
 .menu{
   background-color: transparent;
   border: none;
   border-radius: 12px;
   margin-right: 0;
+}
+
+.header-logo {
+  transition: height 0.3s ease;
+  height: 80px; /* Tamaño normal en desktop */
+}
+
+/* Solo reducir el logo en móvil */
+@media (max-width: 575.98px) {
+  .header-logo {
+    height: 60px !important;
+  }
 }
 
 /* Marca */
@@ -73,30 +115,47 @@ header {
   border-radius: 24px;
   width: 468px !important;
   height: 437px !important;
-  max-width: none !important; /* override .img-fluid */
+  max-width: 100% !important;
   object-fit: cover;
 }
 
+@media (max-width: 991.98px) {
+  .hero {
+    margin-bottom: 3rem;
+  }
+  
+  .hero img.hero-img {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 500px !important;
+  }
+}
+
 /* Search */
-.search { position: relative; }
+.search { 
+  position: relative;
+  width: 100%;
+}
 .controls-row {
   display: flex;
   align-items: center;
   gap: 1rem;
   margin-top: 1.2rem;
+  flex-wrap: wrap;
 }
 .search-wrap {
   width: var(--search-width);
   flex: 0 0 auto;
 }
 .search-input {
-  height: 60px;
+  height: 50px;
   padding-left: 3rem;
   border-radius: var(--radius-pill);
   border: var(--btn-stroke) solid var(--muted-3);
   color: #333;
   box-shadow: none;
   background-color: #d4d0d05b;
+  width: 100%;
 }
 .search-input::placeholder { color:  #4444445b var(--muted); }
 .search-icon {
@@ -121,8 +180,17 @@ header {
   min-width: 160px;
   font-weight: 400 !important;
   letter-spacing: .2px;
-  padding:.7rem 1.9rem;
-  font-size:.95rem;
+  padding: .7rem 1.9rem;
+  font-size: .95rem;
+}
+
+/* Ajustar botón en móvil específicamente */
+@media (max-width: 575.98px) {
+  .btn-pill {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+    min-width: 120px;
+  }
 }
 .btn-signup {
   background: var(--brand-brown, var(--ink));
@@ -144,7 +212,7 @@ header {
 .btn-filter {
   white-space: nowrap;
   flex: 0 0 auto;
-  height: 60px;
+  height: 50px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -190,7 +258,10 @@ header {
 }
 
 /* Chips */
-.chips { gap: .5rem; }
+.chips { 
+  gap: .5rem;
+  margin-top: 0.5rem;
+}
 .chips .chip {
   font-size: .95rem;
   padding: .5rem 1.4rem;
@@ -200,12 +271,15 @@ header {
   color: #f3efef;
   transition: all 0.3s ease;
   border: none;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
 }
 .chips .chip:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 12px rgba(0,0,0,0.15);
   border-color: var(--muted);
-  color: var(--primary);
+  color: #f3efef;
 }
 
 /* Microespacios hero */
@@ -232,10 +306,25 @@ header {
   height: 50px;
   top: 40%;
   transition: background .3s ease;
+  opacity: 0.8;
 }
 .carousel-control-prev:hover,
 .carousel-control-next:hover {
   background: #222222;
+  opacity: 1;
+}
+
+@media (max-width: 575.98px) {
+  .carousel-control-prev-icon,
+  .carousel-control-next-icon {
+    width: 25px;
+    height: 25px;
+  }
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 35px;
+    height: 35px;
+  }
 }
 
 /* Utilidades */
@@ -317,16 +406,387 @@ header {
   box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
   border-top-left-radius: 12px;
   border-bottom-left-radius: 12px;
+  max-width: 300px;
 }
 
+.offcanvas-header {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 1.25rem;
+}
+
+.offcanvas-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: var(--ink);
+}
+
+.offcanvas-body {
+  padding: 1.5rem;
+}
 
 .offcanvas-body a {
   font-size: 1.3rem;
   font-weight: 400;
   color: var(--ink);
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  display: block;
+  margin-bottom: 0.5rem;
 }
 
 .offcanvas-body a:hover {
+  background-color: rgba(68, 68, 68, 0.1);
   color: var(--ink);
+  text-decoration: none;
+}
+
+@media (max-width: 575.98px) {
+  .offcanvas {
+    max-width: 280px;
+    width: 75% !important;
+  }
+  
+  .offcanvas-body a {
+    font-size: 1.1rem;
+    padding: 0.65rem 0.85rem;
+  }
+}
+
+/* ========================================
+   RESPONSIVE DESIGN - MOBILE FIRST
+   ======================================== */
+
+/* Mobile: menos de 576px */
+@media (max-width: 575.98px) {
+  /* Header ajustado - el logo ya está definido arriba */
+  
+  header .search {
+    max-width: 100% !important;
+    width: 100%;
+  }
+  
+  header .search-input {
+    height: 45px;
+    font-size: 14px;
+    padding-left: 2.5rem;
+  }
+  
+  header .search-icon {
+    width: 20px;
+    height: 20px;
+    left: 10px;
+  }
+  
+  /* Hero section */
+  .hero {
+    margin-bottom: 3rem !important;
+  }
+  
+  .hero h1 {
+    font-size: 1.75rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .hero .lead {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .hero-img-container {
+    display: none !important;
+  }
+  
+  /* Chips más pequeños */
+  .chips .chip {
+    font-size: 0.85rem;
+    padding: 0.4rem 1rem;
+  }
+  
+  /* Filtros apilados verticalmente */
+  .filters {
+    padding: 0.5rem;
+  }
+  
+  .filters .col-md-2,
+  .filters .col-md-3,
+  .filters > div[class*='col-'] {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 0.75rem;
+  }
+  
+  .filters input,
+  .filters select,
+  .filters button {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+  
+  .filters .form-check {
+    padding-left: 0;
+  }
+  
+  /* Botón filtros ocupa todo el ancho */
+  .filters .btn-filter {
+    width: 100%;
+    height: 50px;
+  }
+  
+  .filters .col-12 {
+    margin-top: 0.5rem;
+  }
+  
+  /* Grid de propiedades */
+  .propiedades-container {
+    grid-template-columns: 1fr !important;
+    gap: 15px;
+  }
+  
+  /* Cards de propiedad */
+  .property-card {
+    margin-bottom: 1rem;
+  }
+  
+  .property-card .cover-img {
+    height: 180px;
+  }
+  
+  /* Carrusel */
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .carousel-control-prev {
+    left: -5px !important;
+  }
+  
+  .carousel-control-next {
+    right: -5px !important;
+  }
+  
+  /* Detalle propiedad */
+  .detalle-propiedad {
+    grid-template-columns: 1fr !important;
+    gap: 20px;
+  }
+  
+  .slide img,
+  .slide video {
+    height: 250px;
+  }
+  
+  /* Offcanvas más ancho en móvil */
+  .offcanvas {
+    width: 75% !important;
+    max-width: 280px;
+  }
+  
+  .offcanvas-body a {
+    font-size: 1.1rem;
+  }
+  
+  /* Eliminar márgenes innecesarios */
+  .alineado-filtros {
+    margin-left: 0 !important;
+  }
+  
+  /* Botones más accesibles - ya definido arriba, remover duplicado */
+  
+  /* Tabla responsive */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Tablet pequeña: 576px - 767.98px */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  header .search {
+    max-width: 300px !important;
+  }
+  
+  .hero h1 {
+    font-size: 2rem !important;
+  }
+  
+  .hero-img {
+    max-width: 400px !important;
+    height: auto !important;
+  }
+  
+  /* Filtros en 2 columnas */
+  .filters .col-md-2 {
+    width: 48% !important;
+    flex: 0 0 48%;
+  }
+  
+  .propiedades-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .carousel-control-prev {
+    left: -20px !important;
+  }
+  
+  .carousel-control-next {
+    right: -20px !important;
+  }
+}
+
+/* Tablet: 768px - 991.98px */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  header .search {
+    max-width: 350px !important;
+  }
+  
+  .hero h1 {
+    font-size: 2.25rem !important;
+  }
+  
+  .hero-img {
+    max-width: 450px !important;
+    height: auto !important;
+  }
+  
+  /* Filtros en 2-3 columnas */
+  .filters .col-md-2 {
+    width: 48% !important;
+    flex: 0 0 48%;
+  }
+  
+  .propiedades-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .carousel-control-prev {
+    left: -40px !important;
+  }
+  
+  .carousel-control-next {
+    right: -40px !important;
+  }
+}
+
+/* Desktop pequeño: 992px - 1199.98px */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .hero-img {
+    width: 400px !important;
+    height: 370px !important;
+  }
+  
+  .propiedades-container {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  
+  .carousel-control-prev {
+    left: -60px !important;
+  }
+  
+  .carousel-control-next {
+    right: -60px !important;
+  }
+}
+
+/* Desktop grande: 1200px+ */
+@media (min-width: 1200px) {
+  .propiedades-container {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+  
+  .carousel-control-prev {
+    left: -100px !important;
+  }
+  
+  .carousel-control-next {
+    right: -100px !important;
+  }
+}
+
+/* Utilidades responsive adicionales */
+@media (max-width: 767.98px) {
+  .container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  
+  /* Ocultar elementos innecesarios en móvil */
+  .d-mobile-none {
+    display: none !important;
+  }
+  
+  /* Texto centrado en móvil */
+  .text-mobile-center {
+    text-align: center !important;
+  }
+  
+  /* Espaciado reducido */
+  .mt-5, .my-5 {
+    margin-top: 2rem !important;
+  }
+  
+  .mb-5, .my-5 {
+    margin-bottom: 2rem !important;
+  }
+  
+  /* Padding reducido */
+  .py-5 {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+  
+  /* Modales pantalla completa en móvil */
+  .modal-fullscreen-sm-down .modal-body {
+    padding: 1rem;
+  }
+  
+  /* Footer responsive */
+  footer {
+    font-size: 0.9rem;
+    padding: 1.5rem 1rem !important;
+  }
+  
+  /* Pagination más pequeña */
+  .pagination .page-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Botones más accesibles al tacto - solo en móvil */
+  .btn, button, a.btn {
+    min-height: 44px;
+  }
+  
+  /* Asegurar que las tablas sean scrolleables */
+  .table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Ajustar tamaño de fuente global - solo en móvil */
+  body {
+    font-size: 14px;
+  }
+  
+  h1 {
+    font-size: 1.75rem !important;
+  }
+  
+  h2 {
+    font-size: 1.5rem !important;
+  }
+  
+  h3 {
+    font-size: 1.25rem !important;
+  }
+  
+  /* Mejorar legibilidad de inputs - previene zoom en iOS */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
 }

@@ -20,40 +20,44 @@
 
 {% block styles %}{% endblock %}
 </head>
-<body class="{% block body_class %}{% endblock %}" {% block body_style %}{% endblock %}>
+<body class="d-flex flex-column min-vh-100 {% block body_class %}{% endblock %}" {% block body_style %}{% endblock %}>
 
 <header>
-  <nav class="container py-3 d-flex justify-content-between align-items-center" >
-    
-    <!-- Logo -->
-    <a class="navbar-brand d-flex align-items-center text-decoration-none" href="{% url 'home' %}">
-      <img src="{% static 'images/logo.png' %}" alt="InmoFinder" height="110" class="me-2" style="margin-bottom: 0;">
-    </a>
-
-          <!-- Buscador -->
-    
-    <form method="get" action="{% url 'buscar_propiedades' %}" class="search position-relative width-200" style="max-width:430px;">
-      <span class="search-icon"><i class="bi bi-search"></i></span>
-      <input class="form-control search-input" type="text" name="search" placeholder="Search by location, name or description" >
-    </form>
-
-
-    <!-- Parte derecha: login (si no hay sesión) + hamburguesa -->
-    <div class="d-flex align-items-center gap-3">
-      {% if not user.is_authenticated %}
-        <!-- Icono persona -->
-        <a href="{% url 'login' %}" class=" text-dark p-0 m-0"
-          title="Iniciar sesión o registrarse">
-          <i class="bi bi-person fs-3"></i>
+  <nav class="container py-2 py-md-3">
+    <div class="row align-items-center g-2">
+      <!-- Logo -->
+      <div class="col-auto">
+        <a class="navbar-brand d-flex align-items-center text-decoration-none" href="{% url 'home' %}">
+          <img src="{% static 'images/logo.png' %}" alt="InmoFinder" class="me-2 header-logo" style="margin-bottom: 0;">
         </a>
-      {% endif %}
-      <!-- Botón hamburguesa (siempre visible) -->
-      <button class="menu p-0"
-              data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas"
-              aria-controls="menuOffcanvas">
-        <i class="bi bi-list fs-2"></i>
-      </button>
+      </div>
+
+      <!-- Buscador (se mueve abajo en móvil) -->
+      <div class="col order-3 order-md-2">
+        <form method="get" action="{% url 'buscar_propiedades' %}" class="search position-relative w-100">
+          <span class="search-icon"><i class="bi bi-search"></i></span>
+          <input class="form-control search-input w-100" type="text" name="search" 
+                 placeholder="Search by location, name or description"
+                 value="{{ request.GET.search|default_if_none:'' }}">
+        </form>
+      </div>
+
+    <!-- Parte derecha: un único bloque con login (si no hay sesión) + hamburguesa -->
+    <div class="col-auto order-2 order-md-3 ms-auto">
+      <div class="d-flex align-items-center gap-2 gap-md-3">
+        {% if not user.is_authenticated %}
+          <!-- Icono persona -->
+          <a href="{% url 'login' %}" class="text-dark p-0 m-0" title="Iniciar sesión o registrarse">
+            <i class="bi bi-person fs-3"></i>
+          </a>
+        {% endif %}
+        <!-- Botón hamburguesa (siempre visible) -->
+        <button class="menu p-0" data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas" aria-controls="menuOffcanvas">
+          <i class="bi bi-list fs-2"></i>
+        </button>
+      </div>
     </div>
+        </div>
   </nav>
 </header>
 
@@ -80,7 +84,7 @@
 
 
 <!-- Contenido principal -->
-<main class="container">
+<main class="container flex-grow-1">
 <!-- Mensajes de Django -->
 {% if messages %}
   <div class="mt-3">
@@ -112,8 +116,8 @@
 
 <!-- Modal Detalle Propiedad -->
 <div class="modal fade" id="propertyModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content p-3">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
+      <div class="modal-content p-2 p-md-3">
       <div class="modal-body" id="propertyDetailContent">
           <div class="text-center p-5 w-100">
           <div class="spinner-border text-primary"></div>

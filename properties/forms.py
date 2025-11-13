@@ -1,5 +1,4 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from .models import ContactMessage, Propiedad
 
 
@@ -87,9 +86,26 @@ class PropiedadForm(forms.ModelForm):
             if precio_m2 <= 0:
                 self.add_error("area_m2", "El precio por m² debe ser mayor que 0.")
 
+
+        # Validación opcional de cantidad (UX): compara selección vs. remanente
+        if self.instance and self.instance.pk:
+            existentes = self.instance.media.count()
+        else:
+            existentes = 0
+
+        files = self.files.getlist('multimedia_files')
+        if files:
+            remanente = max(0, 10 - existentes)
+            if len(files) > remanente:
+                self.add_error(
+                    "multimedia_files",
+                    f"Puedes subir máximo {remanente} archivo(s) adicional(es). Límite total: 10."
+                )
+
         # Solo habilitar multimedia si no hay errores
         if not self.errors:
             self.enable_multimedia = True
+
         
         return cleaned
 

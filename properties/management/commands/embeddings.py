@@ -14,6 +14,8 @@ ID_PATH = 'property_ids.joblib'
 TOP_K = 5
 
 _model = None  # cache para el modelo
+_embeddings_cache = None  # cache para embeddings en memoria
+_ids_cache = None  # cache para IDs en memoria
 
 
 def _get_model():
@@ -21,6 +23,19 @@ def _get_model():
     if _model is None:
         _model = SentenceTransformer(EMBED_MODEL_NAME)
     return _model
+
+
+def _load_embeddings_to_cache():
+    """Carga embeddings y IDs en memoria (cache global) si aún no están cargados."""
+    global _embeddings_cache, _ids_cache
+    if _embeddings_cache is None or _ids_cache is None:
+        if os.path.exists(EMBED_PATH) and os.path.exists(ID_PATH):
+            _embeddings_cache = np.load(EMBED_PATH)
+            _ids_cache = joblib.load(ID_PATH)
+        else:
+            # Si no existen, intentar generarlos
+            _ids_cache, _embeddings_cache = load_or_generate_embeddings(force=False)
+    return _ids_cache, _embeddings_cache
 
 
 # ---------- GENERADOR DE EMBEDDINGS ----------
@@ -76,30 +91,27 @@ def load_or_generate_embeddings(force: bool = False):
 
 # ---------- BÚSQUEDA ----------
 def buscar_propiedades(query_text, top_k=TOP_K):
-    """Busca propiedades similares a una consulta textual."""
-    if not os.path.exists(EMBED_PATH) or not os.path.exists(ID_PATH):
-        raise CommandError("No hay embeddings. Ejecuta con --build para generarlos.")
+    """Busca propiedades similares a una consulta textual usando embeddings cacheados."""
+    # Cargar embeddings desde cache (en memoria)
+    property_ids, embeddings = _load_embeddings_to_cache()
+    
+    if property_ids is None or embeddings is None:
+        raise CommandError("No hay embeddings disponibles. Ejecuta con --build para generarlos.")
 
     model = _get_model()
     query_vec = model.encode([query_text], convert_to_numpy=True)
 
-    # Cargar embeddings guardados
-    property_ids = joblib.load(ID_PATH)
-    embeddings = np.load(EMBED_PATH)
-
+    # Calcular similitud coseno
     sims = cosine_similarity(query_vec, embeddings).flatten()
     top_idx = np.argsort(-sims)[:top_k]
 
     resultados = []
     for idx in top_idx:
         prop_id = property_ids[idx]
-        prop = Propiedad.objects.get(id=prop_id)
+        # No traer el objeto completo aquí, solo devolver el ID y score
+        # La vista se encargará de filtrar y traer los objetos necesarios
         resultados.append({
             "id": prop_id,
-            "title": prop.title,
-            "location": prop.location,
-            "price": prop.price_cop,
-            "url": prop.listing_url,
             "score": round(float(sims[idx]), 3),
         })
     return resultados
@@ -131,9 +143,15 @@ class Command(BaseCommand):
             results = buscar_propiedades(query, top_k=top_k)
             self.stdout.write("\nResultados más cercanos:")
             for r in results:
-                self.stdout.write(
-                    f"🏠 {r['title']} | {r['location']} | ${r['price']:,} COP | score={r['score']} | {r['url']}"
-                )
+                # Ahora solo tenemos id y score, traemos la propiedad para mostrar
+                try:
+                    prop = Propiedad.objects.get(id=r['id'])
+                    self.stdout.write(
+                        f"🏠 {prop.title} | {prop.location} | ${prop.price_cop:,} COP | score={r['score']}"
+                    )
+                except Propiedad.DoesNotExist:
+                    self.stdout.write(f"🏠 ID {r['id']} no encontrado | score={r['score']}")
+
 
         if not do_build and not query:
             self.stdout.write(
